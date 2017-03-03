@@ -61,6 +61,9 @@ class PfspInstance{
     bool readDataFromFile(char * fileName);
 
     long int computeWCT (vector< int > & sol);
+
+    /* compute the weighted completion time, starting from i (there are no changes before)*/
+    long int computeWCT(vector<int>& sol, int i);
 };
 
 #endif

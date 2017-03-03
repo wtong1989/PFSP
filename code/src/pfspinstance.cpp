@@ -202,3 +202,9 @@ long int PfspInstance::computeWCT(vector< int > & sol)
 
 	return wct;
 }
+
+long int computeWCT(vector<int>& sol, int i) {
+
+
+  
+}

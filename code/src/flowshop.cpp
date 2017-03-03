@@ -64,6 +64,15 @@ void randomPermutation(int nbJobs, vector< int > & sol)
   }
 }
 
+/* transpose move */
+void transpose(vector<int>& sol, int pos) {
+  int temp = sol.at(pos);
+  sol.at(pos) = sol.at(pos+1);
+  sol.at(pos+1) = temp;
+
+  // compute the new wct
+}
+
 /* Improve the solution */
 void iterativeImprovement(int nbJobs, vector< int > & sol) {
 
@@ -83,6 +92,14 @@ void iterativeImprovement(int nbJobs, vector< int > & sol) {
 
   // terminates
 
+}
+
+/* display the solution */
+void displaySolution(vector<int>& sol) {
+  for(int i = 1; i < sol.size(); i++) {
+    cout << sol.at(i) << " ";
+  }
+  cout << endl;
 }
 
 /***********************************************************************/
@@ -125,6 +142,9 @@ int main(int argc, char *argv[])
   /* Compute the TWT of this solution */
   totalWeightedTardiness = instance.computeWCT(solution);
   cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
+
+  transpose(solution, 2);
+  displaySolution(solution);
 
   return 0;
 }
