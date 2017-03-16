@@ -143,8 +143,10 @@ int main(int argc, char *argv[])
   totalWeightedTardiness = instance.computeWCT(solution);
   cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
 
-  transpose(solution, 2);
-  displaySolution(solution);
+  cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
+
+  //transpose(solution, 2);
+  //displaySolution(solution);
 
   return 0;
 }

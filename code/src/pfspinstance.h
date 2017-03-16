@@ -36,6 +36,8 @@ class PfspInstance{
 
     std::vector< std::vector <long int> > processingTimesMatrix;
 
+    std::vector< std::vector<long int> > completionTimesMatrix;
+
   public:
     PfspInstance();
     ~PfspInstance();
@@ -63,7 +65,7 @@ class PfspInstance{
     long int computeWCT (vector< int > & sol);
 
     /* compute the weighted completion time, starting from i (there are no changes before)*/
-    long int computeWCT(vector<int>& sol, int i);
+    long int computePartialWCT(vector<int>& sol, int i);
 };
 
 #endif
