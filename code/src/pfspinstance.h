@@ -37,6 +37,7 @@ class PfspInstance{
     std::vector< std::vector <long int> > processingTimesMatrix;
 
     std::vector< std::vector<long int> > completionTimesMatrix;
+    std::vector<long int> partialCost;
 
   public:
     PfspInstance();

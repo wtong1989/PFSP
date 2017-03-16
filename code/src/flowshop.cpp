@@ -71,20 +71,37 @@ void transpose(vector<int>& sol, int pos) {
   sol.at(pos+1) = temp;
 
   // compute the new wct
+
+}
+
+/* exchange move */
+void exchange(vector<int>& sol, int elt1, int elt2) {
+
+}
+
+/* insert move */
+void insert(vector<int>& sol, int elt, int pos) {
+
 }
 
 /* Improve the solution */
-void iterativeImprovement(int nbJobs, vector< int > & sol) {
+void iterativeImprovement(PfspInstance& instance, vector< int > & sol, int& cost) {
 
   bool improvement = true;
 
+  int bestCost; // best cost so far
+  int aMin, bMin; // changes in the solution
+
   // init
-  randomPermutation(nbJobs, sol);
+  randomPermutation(instance.getNbJob(), sol);
+  bestCost = instance.computePartialWCT(sol, 0);
 
   // step
   while(improvement) {
 
     // pivoting rule
+
+
 
     improvement = false;
 

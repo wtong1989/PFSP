@@ -66,6 +66,9 @@ void PfspInstance::allowMatrixMemory(int nbJ, int nbM)
     }
     completionTimesMatrix.at(0).at(1) = 0;
     completionTimesMatrix.at(1).at(0) = 0;
+
+    partialCost.resize(nbJ+1);
+    partialCost.at(0) = 0;
 }
 
 
@@ -185,7 +188,6 @@ long int PfspInstance::computeWCT(vector< int > & sol)
         processingTimesMatrix[sol[1]][m];
         previousJobEndTime = previousMachineEndTime[1];
 
-
         for ( j = 2; j <= nbJob; ++j )
         {
             jobNumber = sol[j];
@@ -222,16 +224,11 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
         }
     }
 
-    i = max(i, 2);
-
     // other jobs
-    for(int j = i; j <= nbJob; j++) {
-
+    for(int j = max(i, 2); j <= nbJob; j++) {
         jobNumber = sol.at(j);
-
         // first machine
         completionTimesMatrix.at(1).at(j) = completionTimesMatrix[1][j-1] + processingTimesMatrix[jobNumber][1];
-
         // other machines
         for(int m = 2; m <= nbMac; m++) {
 
@@ -242,13 +239,12 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
             }
 
         }
-
     }
 
-    long int res = 0;
-    for(int j = 1; j <= nbJob; j++) {
-        res += completionTimesMatrix[nbMac][j]*priority[sol[j]];
+    // cumulative sum of the weighted completion times
+    for(int j = i; j <= nbJob; j++) {
+        partialCost[j] = partialCost[j-1]+priority[sol[j]]*completionTimesMatrix[nbMac][j];
     }
 
-    return res;
+    return partialCost[nbJob];
 }
