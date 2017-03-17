@@ -69,6 +69,9 @@ void PfspInstance::allowMatrixMemory(int nbJ, int nbM)
 
     partialCost.resize(nbJ+1);
     partialCost.at(0) = 0;
+
+    previousJobEndTime.resize(nbM+1);
+    previousJobEndTime.at(0) = 0;
 }
 
 
@@ -222,10 +225,13 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
         for(int m = 1; m <= nbMac; m++) {
             completionTimesMatrix.at(m).at(1) = completionTimesMatrix.at(m-1).at(1)+processingTimesMatrix.at(jobNumber).at(m);
         }
+        i ++;
+        partialCost.at(1) = priority.at(jobNumber)*completionTimesMatrix.at(nbMac).at(1);
+        cout << completionTimesMatrix.at(nbMac).at(1) << " ; ";
     }
 
     // other jobs
-    for(int j = max(i, 2); j <= nbJob; j++) {
+    for(int j = i; j <= nbJob; j++) {
         jobNumber = sol.at(j);
         // first machine
         completionTimesMatrix.at(1).at(j) = completionTimesMatrix[1][j-1] + processingTimesMatrix[jobNumber][1];
@@ -239,12 +245,61 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
             }
 
         }
+        partialCost.at(j) = partialCost.at(j-1) + priority.at(jobNumber)*completionTimesMatrix.at(nbMac).at(j);
+        cout << completionTimesMatrix.at(nbMac).at(j) << "  ";
+    }
+    cout << endl << endl;
+
+    return partialCost.back();
+}
+
+long int PfspInstance::computePartialWCTN(vector<int>& sol, int i) {
+
+    int jobNumber;
+    long int previousMachineEndTime = 0;
+    long int  res = partialCost.at(i-1);
+
+    // first job
+    if(i == 1) {
+        jobNumber = sol.at(1);
+        for(int m = 1; m <= nbMac; m++) {
+            previousJobEndTime.at(m) = previousJobEndTime.at(m-1) + processingTimesMatrix.at(jobNumber).at(m);
+        }
+        res += previousJobEndTime.at(nbMac)*priority.at(jobNumber);
+        cout << previousJobEndTime.at(nbMac) << " ; ";
+        i ++;
     }
 
-    // cumulative sum of the weighted completion times
+    // other jobs
     for(int j = i; j <= nbJob; j++) {
-        partialCost[j] = partialCost[j-1]+priority[sol[j]]*completionTimesMatrix[nbMac][j];
+        jobNumber = sol.at(j);
+
+        /*if(j == i) {
+            previousJobEndTime.at(1) = completionTimesMatrix.at(1).at(j-1);
+        }*/
+
+        // first machine
+        previousMachineEndTime = previousJobEndTime.at(1) + processingTimesMatrix.at(jobNumber).at(1);
+
+        // other machines
+        for(int m = 2; m <= nbMac; m++) {
+
+            /*if(j == i) {
+                previousJobEndTime.at(m) = completionTimesMatrix.at(m).at(j-1);
+            }*/
+
+            if(previousMachineEndTime > previousJobEndTime.at(m)) {
+                previousMachineEndTime += processingTimesMatrix.at(jobNumber).at(m);
+            } else {
+                previousMachineEndTime = previousJobEndTime.at(m)+processingTimesMatrix.at(jobNumber).at(m);
+            }
+            previousJobEndTime.at(m) = previousMachineEndTime;
+        }
+        res += previousJobEndTime.at(nbMac)*priority.at(jobNumber);
+        cout << previousJobEndTime.at(nbMac) << "  ";
     }
 
-    return partialCost[nbJob];
+    cout << endl;
+    return res;
+
 }

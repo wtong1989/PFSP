@@ -161,6 +161,9 @@ int main(int argc, char *argv[])
   cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
 
   cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
+  // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
+  cout << "test3 : " << instance.computePartialWCTN(solution, 1) << endl;
+
 
   //transpose(solution, 2);
   //displaySolution(solution);
