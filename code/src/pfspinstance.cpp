@@ -274,19 +274,20 @@ long int PfspInstance::computePartialWCTN(vector<int>& sol, int i) {
     for(int j = i; j <= nbJob; j++) {
         jobNumber = sol.at(j);
 
-        /*if(j == i) {
+        if(j == i) {
             previousJobEndTime.at(1) = completionTimesMatrix.at(1).at(j-1);
-        }*/
+        }
 
         // first machine
         previousMachineEndTime = previousJobEndTime.at(1) + processingTimesMatrix.at(jobNumber).at(1);
+        previousJobEndTime.at(1) = previousMachineEndTime;
 
         // other machines
         for(int m = 2; m <= nbMac; m++) {
 
-            /*if(j == i) {
+            if(j == i) {
                 previousJobEndTime.at(m) = completionTimesMatrix.at(m).at(j-1);
-            }*/
+            }
 
             if(previousMachineEndTime > previousJobEndTime.at(m)) {
                 previousMachineEndTime += processingTimesMatrix.at(jobNumber).at(m);

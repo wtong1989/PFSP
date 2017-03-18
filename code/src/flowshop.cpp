@@ -64,24 +64,72 @@ void randomPermutation(int nbJobs, vector< int > & sol)
   }
 }
 
+
+
 /* transpose move */
 void transpose(vector<int>& sol, int pos) {
   int temp = sol.at(pos);
-  sol.at(pos) = sol.at(pos+1);
-  sol.at(pos+1) = temp;
 
-  // compute the new wct
+  int next = (sol.size() == pos+1 ? 1 : pos+1);
 
+  sol.at(pos) = sol.at(next);
+  sol.at(next) = temp;
 }
 
 /* exchange move */
 void exchange(vector<int>& sol, int elt1, int elt2) {
-
+    int temp = sol.at(elt1);
+    sol.at(elt1) = sol.at(elt2);
+    sol.at(elt2) = temp;
 }
 
 /* insert move */
 void insert(vector<int>& sol, int elt, int pos) {
 
+    int value = sol.at(elt);
+
+    for(int i = elt; i < pos; i++) {
+        sol.at(i) = sol.at(i+1);
+    }
+    sol.at(pos) = value;
+
+}
+
+
+/* transpose improvement */
+bool transposeImprovement(PfspInstance& instance, vector<int>& sol, int& cost, bool bestImp) {
+
+    long int bestNewCost, newCost;
+    int bestPos = -1;
+    bool improve = false;
+    for(int i = 1; i <= instance.getNbJob(); i++) {
+
+        transpose(sol, i);
+        newCost = instance.computePartialWCTN(sol, i);
+
+        if(bestImp) {
+            if(i == 1 || newCost > bestNewCost) {
+                bestNewCost = newCost;
+                bestPos = i;
+            }
+            transpose(sol, i); // move is canceled
+        } else {
+            if(newCost > cost) {
+                // first improvement, the move is applied directly
+                instance.computePartialWCT(sol, i);
+                improve = true;
+                cost = newCost;
+            }
+        }
+    }
+
+    if(bestImp && bestNewCost > bestImp) {
+        improve = true;
+        transpose(sol, bestPos);
+        cost = instance.computePartialWCT(sol, bestPos);
+    }
+
+    return improve;
 }
 
 /* Improve the solution */
@@ -162,7 +210,7 @@ int main(int argc, char *argv[])
 
   cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
   // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
-  cout << "test3 : " << instance.computePartialWCTN(solution, 1) << endl;
+  cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
 
 
   //transpose(solution, 2);
