@@ -47,6 +47,10 @@ int PfspInstance::getNbMac()
     return nbMac;
 }
 
+long int PfspInstance::getPriority(int i) {
+    return priority.at(i);
+}
+
 
 
 /* Allow the memory for the processing times matrix : */
@@ -227,7 +231,6 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
         }
         i ++;
         partialCost.at(1) = priority.at(jobNumber)*completionTimesMatrix.at(nbMac).at(1);
-        cout << completionTimesMatrix.at(nbMac).at(1) << " ; ";
     }
 
     // other jobs
@@ -246,9 +249,7 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
 
         }
         partialCost.at(j) = partialCost.at(j-1) + priority.at(jobNumber)*completionTimesMatrix.at(nbMac).at(j);
-        cout << completionTimesMatrix.at(nbMac).at(j) << "  ";
     }
-    cout << endl << endl;
 
     return partialCost.back();
 }
@@ -266,7 +267,6 @@ long int PfspInstance::computePartialWCTN(vector<int>& sol, int i) {
             previousJobEndTime.at(m) = previousJobEndTime.at(m-1) + processingTimesMatrix.at(jobNumber).at(m);
         }
         res += previousJobEndTime.at(nbMac)*priority.at(jobNumber);
-        cout << previousJobEndTime.at(nbMac) << " ; ";
         i ++;
     }
 
@@ -297,10 +297,7 @@ long int PfspInstance::computePartialWCTN(vector<int>& sol, int i) {
             previousJobEndTime.at(m) = previousMachineEndTime;
         }
         res += previousJobEndTime.at(nbMac)*priority.at(jobNumber);
-        cout << previousJobEndTime.at(nbMac) << "  ";
     }
-
-    cout << endl;
     return res;
 
 }

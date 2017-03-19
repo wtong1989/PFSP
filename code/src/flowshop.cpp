@@ -24,9 +24,19 @@
 #include <cstdlib>
 #include <ctime>
 #include "pfspinstance.h"
+#include <algorithm>
 
 using namespace std;
 
+struct strSort {
+    long int job;
+    long int wSum;
+
+    bool operator()(strSort& a, strSort& b) {
+        return a.wSum < b.wSum;
+    }
+
+} sortObj;
 
 int generateRndPosition(int min, int max)
 {
@@ -64,6 +74,46 @@ void randomPermutation(int nbJobs, vector< int > & sol)
   }
 }
 
+/* simplified rz heuristic */
+void rzHeuristic(PfspInstance& instance, vector<int>& sol) {
+
+    vector<strSort> weightedSum(instance.getNbJob());
+
+    for(int i = 1; i <= instance.getNbJob(); i++) {
+        weightedSum.at(i-1).job = i;
+        weightedSum.at(i-1).wSum = 0;
+        for(int j = 1; j <= instance.getNbMac(); j++) {
+            weightedSum.at(i-1).wSum += instance.getTime(i, j);
+        }
+        weightedSum.at(i-1).wSum /= instance.getPriority(i);
+    }
+    sort(weightedSum.begin(), weightedSum.end(), strSort());
+
+    for(int i = 0; i < weightedSum.size(); i++) {
+        cout << weightedSum.at(i).wSum << "  ";
+    }
+    cout << endl;
+
+
+    sol.at(1) = weightedSum.at(0).job;
+    for(int i = 2; i <= instance.getNbJob(); i++) {
+
+        long int bestCost = -1;
+        long int bestPos = -1;
+
+        for(int j = i; j >= 1; j--) {
+
+            sol.at(j) = weightedSum.at(i-1).job;
+            // compute partial score
+
+
+        }
+
+    }
+
+
+}
+
 
 
 /* transpose move */
@@ -88,8 +138,14 @@ void insert(vector<int>& sol, int elt, int pos) {
 
     int value = sol.at(elt);
 
-    for(int i = elt; i < pos; i++) {
-        sol.at(i) = sol.at(i+1);
+    if(pos > elt) {
+        for(int i = elt; i < pos; i++) {
+            sol.at(i) = sol.at(i+1);
+        }
+    } else {
+        for(int i = elt; i > pos; i--) {
+            sol.at(i) = sol.at(i-1);
+        }
     }
     sol.at(pos) = value;
 
@@ -97,33 +153,35 @@ void insert(vector<int>& sol, int elt, int pos) {
 
 
 /* transpose improvement */
-bool transposeImprovement(PfspInstance& instance, vector<int>& sol, int& cost, bool bestImp) {
+bool transposeImprovement(PfspInstance& instance, vector<int>& sol, long int& cost, bool bestImp) {
 
     long int bestNewCost, newCost;
     int bestPos = -1;
     bool improve = false;
+
     for(int i = 1; i <= instance.getNbJob(); i++) {
 
         transpose(sol, i);
         newCost = instance.computePartialWCTN(sol, i);
 
         if(bestImp) {
-            if(i == 1 || newCost > bestNewCost) {
+            if(i == 1 || newCost < bestNewCost) {
                 bestNewCost = newCost;
                 bestPos = i;
             }
             transpose(sol, i); // move is canceled
         } else {
-            if(newCost > cost) {
+            if(newCost < cost) {
                 // first improvement, the move is applied directly
-                instance.computePartialWCT(sol, i);
+                cout << "test : " << newCost << endl;
+                cost = instance.computePartialWCT(sol, i);
+                cout << "test2 : " << cost << endl;
                 improve = true;
-                cost = newCost;
             }
         }
     }
 
-    if(bestImp && bestNewCost > bestImp) {
+    if(bestImp && bestNewCost < bestImp) {
         improve = true;
         transpose(sol, bestPos);
         cost = instance.computePartialWCT(sol, bestPos);
@@ -132,8 +190,91 @@ bool transposeImprovement(PfspInstance& instance, vector<int>& sol, int& cost, b
     return improve;
 }
 
+/* exchange improvement */
+bool exchangeImprovement(PfspInstance& instance, vector<int>& sol, long int& cost, bool bestImp) {
+
+    long int bestNewCost, newCost;
+    int bestPosA = -1, bestPosB = -1;
+    bool improve = false;
+
+    for(int i = 1; i <= instance.getNbJob()-1; i++) {
+
+        for(int j = i+1; j <= instance.getNbJob(); j++) {
+
+            exchange(sol, i, j);
+            newCost = instance.computePartialWCTN(sol, i);
+
+            if(bestImp) {
+                if((i == 1 && j == 2) || newCost < bestNewCost) {
+                    bestNewCost = newCost;
+                    bestPosA = i;
+                    bestPosB = j;
+                }
+                exchange(sol, i, j); // move is canceled
+            } else {
+                if(newCost < cost) {
+                    // first improvement, the move is applied directly
+                    instance.computePartialWCT(sol, i);
+                    improve = true;
+                    cost = newCost;
+                }
+            }
+        }
+    }
+
+    if(bestImp && bestNewCost < bestImp) {
+        improve = true;
+        exchange(sol, bestPosA, bestPosB);
+        cost = instance.computePartialWCT(sol, bestPosA);
+    }
+
+    return improve;
+
+}
+
+/* transpose improvement */
+bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost, bool bestImp) {
+
+    long int bestNewCost, newCost;
+    int bestPosA = -1, bestPosB = -1;
+    bool improve = false;
+    for(int i = 1; i <= instance.getNbJob()-1; i++) {
+
+        for(int j = i+1; j <= instance.getNbJob(); i++) {
+
+            insert(sol, i, j);
+            newCost = instance.computePartialWCTN(sol, i);
+
+            if(bestImp) {
+                if(i == 1 || newCost < bestNewCost) {
+                    bestNewCost = newCost;
+                    bestPosA = i;
+                    bestPosB = j;
+                }
+                insert(sol, j, i); // move is canceled
+            } else {
+                if(newCost < cost) {
+                    // first improvement, the move is applied directly
+                    instance.computePartialWCT(sol, i);
+                    improve = true;
+                    cost = newCost;
+                }
+            }
+
+        }
+    }
+
+    if(bestImp && bestNewCost < bestImp) {
+        improve = true;
+        insert(sol, bestPosA, bestPosB);
+        cost = instance.computePartialWCT(sol, bestPosA);
+    }
+
+    return improve;
+}
+
 /* Improve the solution */
-void iterativeImprovement(PfspInstance& instance, vector< int > & sol, int& cost) {
+void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int& cost, bool bestImp, int neighborhood, bool rhHeuristic) {
 
   bool improvement = true;
 
@@ -141,21 +282,27 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, int& cost
   int aMin, bMin; // changes in the solution
 
   // init
-  randomPermutation(instance.getNbJob(), sol);
-  bestCost = instance.computePartialWCT(sol, 0);
+  if(rzHeuristic) {
+
+  } else {
+      randomPermutation(instance.getNbJob(), sol);
+  }
+
+  bestCost = instance.computePartialWCT(sol, 1);
 
   // step
   while(improvement) {
 
-    // pivoting rule
+    if(neighborhood == 0) {
+        improvement = transposeImprovement(instance, sol, cost, bestImp);
+    } else if(neighborhood == 1) {
+        improvement = exchangeImprovement(instance, sol, cost, bestImp);
+    } else {
+        improvement = insertImprovement(instance, sol, cost, bestImp);
+    }
 
-
-
-    improvement = false;
-
+    cout << cost << endl;
   }
-
-  // terminates
 
 }
 
@@ -208,10 +355,15 @@ int main(int argc, char *argv[])
   totalWeightedTardiness = instance.computeWCT(solution);
   cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
 
-  cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
+  // cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
   // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
-  cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
+  // cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
 
+  // rzHeuristic(instance, solution);
+
+  iterativeImprovement(instance, solution, totalWeightedTardiness, false, 0, false);
+  cout << endl << totalWeightedTardiness << endl;
+  cout << instance.computePartialWCT(solution, 1) << endl;
 
   //transpose(solution, 2);
   //displaySolution(solution);
