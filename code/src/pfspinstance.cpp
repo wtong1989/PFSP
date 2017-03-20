@@ -229,12 +229,11 @@ long int PfspInstance::computePartialWCT(vector<int>& sol, int i) {
         for(int m = 1; m <= nbMac; m++) {
             completionTimesMatrix.at(m).at(1) = completionTimesMatrix.at(m-1).at(1)+processingTimesMatrix.at(jobNumber).at(m);
         }
-        i ++;
         partialCost.at(1) = priority.at(jobNumber)*completionTimesMatrix.at(nbMac).at(1);
     }
 
     // other jobs
-    for(int j = i; j <= nbJob; j++) {
+    for(int j = max(i, 2); j <= nbJob; j++) {
         jobNumber = sol.at(j);
         // first machine
         completionTimesMatrix.at(1).at(j) = completionTimesMatrix[1][j-1] + processingTimesMatrix[jobNumber][1];
@@ -267,11 +266,10 @@ long int PfspInstance::computePartialWCTN(vector<int>& sol, int i) {
             previousJobEndTime.at(m) = previousJobEndTime.at(m-1) + processingTimesMatrix.at(jobNumber).at(m);
         }
         res += previousJobEndTime.at(nbMac)*priority.at(jobNumber);
-        i ++;
     }
 
     // other jobs
-    for(int j = i; j <= nbJob; j++) {
+    for(int j = max(i, 2); j <= nbJob; j++) {
         jobNumber = sol.at(j);
 
         if(j == i) {

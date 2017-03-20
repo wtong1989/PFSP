@@ -38,6 +38,14 @@ struct strSort {
 
 } sortObj;
 
+/* display the solution */
+void displaySolution(vector<int>& sol) {
+  for(int i = 1; i < sol.size(); i++) {
+    cout << sol.at(i) << " ";
+  }
+  cout << endl;
+}
+
 int generateRndPosition(int min, int max)
 {
   return ( rand() % max + min );
@@ -173,10 +181,10 @@ bool transposeImprovement(PfspInstance& instance, vector<int>& sol, long int& co
         } else {
             if(newCost < cost) {
                 // first improvement, the move is applied directly
-                cout << "test : " << newCost << endl;
                 cost = instance.computePartialWCT(sol, i);
-                cout << "test2 : " << cost << endl;
                 improve = true;
+            } else {
+                transpose(sol, i); // no improvement, the move is canceled
             }
         }
     }
@@ -238,37 +246,95 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
     long int bestNewCost, newCost;
     int bestPosA = -1, bestPosB = -1;
     bool improve = false;
-    for(int i = 1; i <= instance.getNbJob()-1; i++) {
 
-        for(int j = i+1; j <= instance.getNbJob(); i++) {
+    cout << "begining: " << endl;
+    displaySolution(sol);
+    cout << "cost beg: " << cost << endl;
 
-            insert(sol, i, j);
-            newCost = instance.computePartialWCTN(sol, i);
+    for(int i = 1; i <= instance.getNbJob(); i++) {
 
+        bool reset = true;
+        if(i > 1) {
+            insert(sol, i, 1);
+            newCost = instance.computePartialWCT(sol, 1);
             if(bestImp) {
-                if(i == 1 || newCost < bestNewCost) {
+                if(i == 2 || newCost < bestNewCost) {
                     bestNewCost = newCost;
                     bestPosA = i;
-                    bestPosB = j;
+                    bestPosB = 1;
                 }
-                insert(sol, j, i); // move is canceled
             } else {
                 if(newCost < cost) {
-                    // first improvement, the move is applied directly
-                    instance.computePartialWCT(sol, i);
                     improve = true;
+                    reset = false;
+                    bestPosB = 1;
                     cost = newCost;
                 }
             }
 
         }
+
+        for(int j = 2; j <= instance.getNbJob(); j++) {
+
+            transpose(sol, j-1);
+
+            // newCost = instance.computePartialWCT(sol, min(i, j-1));
+            newCost = instance.computePartialWCT(sol, 1);
+
+            // cout << "newCost: " << newCost << endl;
+            // cout << "newCost2: " << instance.computePartialWCTN(sol, 1) << endl;
+
+            if(bestImp) {
+                if(j == 2 || newCost < bestNewCost) {
+                    bestNewCost = newCost;
+                    bestPosA = i;
+                    bestPosB = j;
+                }
+            } else {
+                if(newCost < cost) {
+                    // first improvement, the move is applied directly
+                    // cost = instance.computePartialWCT(sol, min(i, j-1));
+                    cost = instance.computePartialWCT(sol, 1);
+
+                    // displaySolution(sol);
+
+                    improve = true;
+                    reset = false;
+                    bestPosB = j;
+                }
+            }
+        }
+
+        if(reset || bestImp) {
+            if(i < instance.getNbJob()) {
+                // cancel the move, reset the element to the initial position
+                insert(sol, instance.getNbJob(), i);
+            }
+        } else {
+            // go back to the best position found
+            insert(sol, instance.getNbJob(), bestPosB);
+            // displaySolution(sol);
+        }
     }
 
-    if(bestImp && bestNewCost < bestImp) {
+    if(bestImp && bestNewCost < cost) {
         improve = true;
+        cout << "sol before: " << endl;
+        displaySolution(sol);
         insert(sol, bestPosA, bestPosB);
-        cost = instance.computePartialWCT(sol, bestPosA);
+        cout << "sol after: " << endl;
+        displaySolution(sol);
+        cost = bestNewCost;
+        cout << "improvement: " << cost << endl;
     }
+
+    cout << "cost end: " << cost << endl;
+    cost = instance.computePartialWCT(sol, 1);
+    cout << "newCost: " << newCost << endl;
+
+    cout << "end: " << endl;
+    displaySolution(sol);
+    cout << "improve : " << improve << " " << endl;
 
     return improve;
 }
@@ -282,12 +348,12 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
   int aMin, bMin; // changes in the solution
 
   // init
-  if(rzHeuristic) {
+  /*if(rzHeuristic) {
 
   } else {
       randomPermutation(instance.getNbJob(), sol);
-  }
-
+  }*/
+  displaySolution(sol);
   bestCost = instance.computePartialWCT(sol, 1);
 
   // step
@@ -301,17 +367,10 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
         improvement = insertImprovement(instance, sol, cost, bestImp);
     }
 
+    cost = instance.computePartialWCT(sol, 1);
     cout << cost << endl;
   }
 
-}
-
-/* display the solution */
-void displaySolution(vector<int>& sol) {
-  for(int i = 1; i < sol.size(); i++) {
-    cout << sol.at(i) << " ";
-  }
-  cout << endl;
 }
 
 /***********************************************************************/
@@ -361,9 +420,14 @@ int main(int argc, char *argv[])
 
   // rzHeuristic(instance, solution);
 
-  iterativeImprovement(instance, solution, totalWeightedTardiness, false, 0, false);
+  for(int i = 1; i < solution.size(); i++) {
+      solution.at(i) = i;
+  }
+
+  iterativeImprovement(instance, solution, totalWeightedTardiness, true, 2, false);
   cout << endl << totalWeightedTardiness << endl;
-  cout << instance.computePartialWCT(solution, 1) << endl;
+  cout << instance.computeWCT(solution) << endl;
+  cout << instance.computePartialWCTN(solution, 1) << endl;
 
   //transpose(solution, 2);
   //displaySolution(solution);
