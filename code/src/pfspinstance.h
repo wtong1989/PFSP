@@ -72,6 +72,12 @@ class PfspInstance{
 
     /* compute the weighted completion time, starting from i whithout changing the completion times matrix*/
     long int computePartialWCTN(vector<int>& sol, int i);
+
+    /* compute the weighted completion time, starting from i to j (there are no changes before)*/
+    long int computePartialWCT(vector<int>& sol, int i, int end);
+
+    /* compute the weighted completion time, starting from i to j whithout changing the completion times matrix*/
+    long int computePartialWCTN(vector<int>& sol, int i, int end);
 };
 
 #endif

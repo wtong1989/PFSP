@@ -51,79 +51,6 @@ int generateRndPosition(int min, int max)
   return ( rand() % max + min );
 }
 
-
-/* Fill the solution with numbers between 1 and nbJobs, shuffled */
-void randomPermutation(int nbJobs, vector< int > & sol)
-{
-  vector<bool> alreadyTaken(nbJobs+1, false); // nbJobs elements with value false
-  vector<int > choosenNumber(nbJobs+1, 0);
-
-  int nbj;
-  int rnd, i, j, nbFalse;
-
-  nbj = 0;
-  for (i = nbJobs; i >= 1; --i)
-  {
-    rnd = generateRndPosition(1, i);
-    nbFalse = 0;
-
-    /* find the rndth cell with value = false : */
-    for (j = 1; nbFalse < rnd; ++j)
-      if ( ! alreadyTaken[j] )
-        ++nbFalse;
-    --j;
-
-    sol[j] = i;
-
-    ++nbj;
-    choosenNumber[nbj] = j;
-
-    alreadyTaken[j] = true;
-  }
-}
-
-/* simplified rz heuristic */
-void rzHeuristic(PfspInstance& instance, vector<int>& sol) {
-
-    vector<strSort> weightedSum(instance.getNbJob());
-
-    for(int i = 1; i <= instance.getNbJob(); i++) {
-        weightedSum.at(i-1).job = i;
-        weightedSum.at(i-1).wSum = 0;
-        for(int j = 1; j <= instance.getNbMac(); j++) {
-            weightedSum.at(i-1).wSum += instance.getTime(i, j);
-        }
-        weightedSum.at(i-1).wSum /= instance.getPriority(i);
-    }
-    sort(weightedSum.begin(), weightedSum.end(), strSort());
-
-    for(int i = 0; i < weightedSum.size(); i++) {
-        cout << weightedSum.at(i).wSum << "  ";
-    }
-    cout << endl;
-
-
-    sol.at(1) = weightedSum.at(0).job;
-    for(int i = 2; i <= instance.getNbJob(); i++) {
-
-        long int bestCost = -1;
-        long int bestPos = -1;
-
-        for(int j = i; j >= 1; j--) {
-
-            sol.at(j) = weightedSum.at(i-1).job;
-            // compute partial score
-
-
-        }
-
-    }
-
-
-}
-
-
-
 /* transpose move */
 void transpose(vector<int>& sol, int pos) {
   int temp = sol.at(pos);
@@ -160,6 +87,90 @@ void insert(vector<int>& sol, int elt, int pos) {
 }
 
 
+/* Fill the solution with numbers between 1 and nbJobs, shuffled */
+void randomPermutation(int nbJobs, vector< int > & sol)
+{
+  vector<bool> alreadyTaken(nbJobs+1, false); // nbJobs elements with value false
+  vector<int > choosenNumber(nbJobs+1, 0);
+
+  int nbj;
+  int rnd, i, j, nbFalse;
+
+  nbj = 0;
+  for (i = nbJobs; i >= 1; --i)
+  {
+    rnd = generateRndPosition(1, i);
+    nbFalse = 0;
+
+    /* find the rndth cell with value = false : */
+    for (j = 1; nbFalse < rnd; ++j)
+      if ( ! alreadyTaken[j] )
+        ++nbFalse;
+    --j;
+
+    sol[j] = i;
+
+    ++nbj;
+    choosenNumber[nbj] = j;
+
+    alreadyTaken[j] = true;
+  }
+}
+
+/* simplified rz heuristic */
+long int rzHeuristic(PfspInstance& instance, vector<int>& sol) {
+
+    long int res = 0;
+    vector<strSort> weightedSum(instance.getNbJob());
+
+    // sort the jobs according to the weighted sums
+    for(int i = 1; i <= instance.getNbJob(); i++) {
+        weightedSum.at(i-1).job = i;
+        weightedSum.at(i-1).wSum = 0;
+        for(int j = 1; j <= instance.getNbMac(); j++) {
+            weightedSum.at(i-1).wSum += instance.getTime(i, j);
+        }
+        weightedSum.at(i-1).wSum /= instance.getPriority(i);
+    }
+    sort(weightedSum.begin(), weightedSum.end(), strSort());
+
+    sol.at(1) = weightedSum.at(0).job;
+
+    // start computing the matrix
+    instance.computePartialWCT(sol, 1, 1);
+
+    for(int i = 2; i <= instance.getNbJob(); i++) {
+
+        // for each element, determine the best insertion position
+        long int bestCost;
+        long int bestPos;
+
+        // first position tested : end of the solution
+        sol.at(i) = weightedSum.at(i-1).job;
+        bestCost = instance.computePartialWCT(sol, i, i);
+        bestPos = i;
+
+        for(int j = i-1; j >= 1; j--) {
+
+            // sol.at(j) = weightedSum.at(i-1).job;
+            transpose(sol, j);
+            // compute partial score
+            long int cost = instance.computePartialWCTN(sol, j, i);
+            if(cost < bestCost) {
+                bestCost = cost;
+                bestPos = j;
+            }
+        }
+
+        // the element is now in the first position, move it back to the best pos found
+        insert(sol, 1, bestPos);
+        res = instance.computePartialWCT(sol, bestPos, i);
+    }
+
+    return res;
+}
+
+
 /* transpose improvement */
 bool transposeImprovement(PfspInstance& instance, vector<int>& sol, long int& cost, bool bestImp) {
 
@@ -189,7 +200,7 @@ bool transposeImprovement(PfspInstance& instance, vector<int>& sol, long int& co
         }
     }
 
-    if(bestImp && bestNewCost < bestImp) {
+    if(bestImp && bestNewCost < cost) {
         improve = true;
         transpose(sol, bestPos);
         cost = instance.computePartialWCT(sol, bestPos);
@@ -225,12 +236,14 @@ bool exchangeImprovement(PfspInstance& instance, vector<int>& sol, long int& cos
                     instance.computePartialWCT(sol, i);
                     improve = true;
                     cost = newCost;
+                } else {
+                    exchange(sol, i, j); // move is canceled
                 }
             }
         }
     }
 
-    if(bestImp && bestNewCost < bestImp) {
+    if(bestImp && bestNewCost < cost) {
         improve = true;
         exchange(sol, bestPosA, bestPosB);
         cost = instance.computePartialWCT(sol, bestPosA);
@@ -247,10 +260,6 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
     int bestPosA = -1, bestPosB = -1;
     bool improve = false;
 
-    cout << "begining: " << endl;
-    displaySolution(sol);
-    cout << "cost beg: " << cost << endl;
-
     for(int i = 1; i <= instance.getNbJob(); i++) {
 
         bool reset = true;
@@ -258,7 +267,7 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
             insert(sol, i, 1);
             newCost = instance.computePartialWCT(sol, 1);
             if(bestImp) {
-                if(i == 2 || newCost < bestNewCost) {
+                if(newCost < bestNewCost) {
                     bestNewCost = newCost;
                     bestPosA = i;
                     bestPosB = 1;
@@ -285,7 +294,7 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
             // cout << "newCost2: " << instance.computePartialWCTN(sol, 1) << endl;
 
             if(bestImp) {
-                if(j == 2 || newCost < bestNewCost) {
+                if((j == 2 && i == 1) || newCost < bestNewCost) {
                     bestNewCost = newCost;
                     bestPosA = i;
                     bestPosB = j;
@@ -296,7 +305,6 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
                     // cost = instance.computePartialWCT(sol, min(i, j-1));
                     cost = instance.computePartialWCT(sol, 1);
 
-                    // displaySolution(sol);
 
                     improve = true;
                     reset = false;
@@ -319,28 +327,17 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
 
     if(bestImp && bestNewCost < cost) {
         improve = true;
-        cout << "sol before: " << endl;
-        displaySolution(sol);
         insert(sol, bestPosA, bestPosB);
-        cout << "sol after: " << endl;
-        displaySolution(sol);
         cost = bestNewCost;
-        cout << "improvement: " << cost << endl;
     }
 
-    cout << "cost end: " << cost << endl;
     cost = instance.computePartialWCT(sol, 1);
-    cout << "newCost: " << newCost << endl;
-
-    cout << "end: " << endl;
-    displaySolution(sol);
-    cout << "improve : " << improve << " " << endl;
 
     return improve;
 }
 
 /* Improve the solution */
-void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int& cost, bool bestImp, int neighborhood, bool rhHeuristic) {
+void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int& cost, bool bestImp, int neighborhood, bool rz) {
 
   bool improvement = true;
 
@@ -348,13 +345,13 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
   int aMin, bMin; // changes in the solution
 
   // init
-  /*if(rzHeuristic) {
-
+  if(rz) {
+      // TODO
   } else {
       randomPermutation(instance.getNbJob(), sol);
-  }*/
-  displaySolution(sol);
-  bestCost = instance.computePartialWCT(sol, 1);
+  }
+  // displaySolution(sol);
+  cost = instance.computePartialWCT(sol, 1);
 
   // step
   while(improvement) {
@@ -368,7 +365,7 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
     }
 
     cost = instance.computePartialWCT(sol, 1);
-    cout << cost << endl;
+    // cout << cost << endl;
   }
 
 }
@@ -403,31 +400,33 @@ int main(int argc, char *argv[])
   vector< int > solution ( instance.getNbJob()+ 1 );
 
   /* Fill the vector with a random permutation */
-  randomPermutation(instance.getNbJob(), solution);
+  /*randomPermutation(instance.getNbJob(), solution);
 
   cout << "Random solution: " ;
   for (i = 1; i <= instance.getNbJob(); ++i)
     cout << solution[i] << " " ;
-  cout << endl;
+  cout << endl;*/
 
   /* Compute the TWT of this solution */
-  totalWeightedTardiness = instance.computeWCT(solution);
-  cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
+  // totalWeightedTardiness = instance.computeWCT(solution);
+  // cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
 
   // cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
   // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
   // cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
 
-  // rzHeuristic(instance, solution);
+  cout << "simplified rz heuristic" << endl;
+  totalWeightedTardiness = rzHeuristic(instance, solution);
 
-  for(int i = 1; i < solution.size(); i++) {
-      solution.at(i) = i;
-  }
+  cout << "cost: " << totalWeightedTardiness << " vs " << instance.computeWCT(solution) << endl;
 
-  iterativeImprovement(instance, solution, totalWeightedTardiness, true, 2, false);
-  cout << endl << totalWeightedTardiness << endl;
-  cout << instance.computeWCT(solution) << endl;
-  cout << instance.computePartialWCTN(solution, 1) << endl;
+  cout << endl << endl;
+  displaySolution(solution);
+
+  // iterativeImprovement(instance, solution, totalWeightedTardiness, true, 1, false);
+  // cout << endl << totalWeightedTardiness << endl;
+  // cout << instance.computeWCT(solution) << endl;
+  // cout << instance.computePartialWCTN(solution, 1) << endl;
 
   //transpose(solution, 2);
   //displaySolution(solution);
