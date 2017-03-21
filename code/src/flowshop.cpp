@@ -38,6 +38,12 @@ struct strSort {
 
 } sortObj;
 
+struct parameters {
+    bool bestImp;
+    bool rz;
+    int neighborhood;
+} param;
+
 /* display the solution */
 void displaySolution(vector<int>& sol) {
   for(int i = 1; i < sol.size(); i++) {
@@ -253,7 +259,7 @@ bool exchangeImprovement(PfspInstance& instance, vector<int>& sol, long int& cos
 
 }
 
-/* transpose improvement */
+/* insert improvement */
 bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost, bool bestImp) {
 
     long int bestNewCost, newCost;
@@ -280,7 +286,6 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
                     cost = newCost;
                 }
             }
-
         }
 
         for(int j = 2; j <= instance.getNbJob(); j++) {
@@ -337,7 +342,7 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
 }
 
 /* Improve the solution */
-void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int& cost, bool bestImp, int neighborhood, bool rz) {
+void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int& cost, parameters& param) {
 
   bool improvement = true;
 
@@ -345,28 +350,76 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
   int aMin, bMin; // changes in the solution
 
   // init
-  if(rz) {
-      // TODO
+  if(param.rz) {
+      cost = rzHeuristic(instance, sol);
   } else {
       randomPermutation(instance.getNbJob(), sol);
+      cost = instance.computePartialWCT(sol, 1);
   }
   // displaySolution(sol);
-  cost = instance.computePartialWCT(sol, 1);
 
   // step
   while(improvement) {
 
-    if(neighborhood == 0) {
-        improvement = transposeImprovement(instance, sol, cost, bestImp);
-    } else if(neighborhood == 1) {
-        improvement = exchangeImprovement(instance, sol, cost, bestImp);
+    if(param.neighborhood == 0) {
+        improvement = transposeImprovement(instance, sol, cost, param.bestImp);
+    } else if(param.neighborhood == 1) {
+        improvement = exchangeImprovement(instance, sol, cost, param.bestImp);
     } else {
-        improvement = insertImprovement(instance, sol, cost, bestImp);
+        improvement = insertImprovement(instance, sol, cost, param.bestImp);
     }
 
     cost = instance.computePartialWCT(sol, 1);
-    // cout << cost << endl;
   }
+
+}
+
+/*----------------------------------------------------------------------------*/
+void extractParameters(char* cmd[], int nb, parameters& param) {
+
+    string str;
+    for(int i = 2; i < nb; i++) {
+        str += cmd[i];
+    }
+
+    if(str.find("--srz") != string::npos) {
+        param.rz = true;
+    } else if(str.find("--random") != string::npos) {
+        param.rz = false;
+    } else {
+        param.rz = false;
+    }
+
+    if(str.find("--transpose") != string::npos) {
+        param.neighborhood = 0;
+    } else if(str.find("--exchange") != string::npos) {
+        param.neighborhood = 1;
+    } else if (str.find("--insert") != string::npos){
+        param.neighborhood = 2;
+    } else {
+        param.neighborhood = 0;
+    }
+
+    if(str.find("--first") != string::npos) {
+        param.bestImp = false;
+    } else if(str.find("--best") != string::npos){
+        param.bestImp = true;
+    } else {
+        param.bestImp = false;
+    }
+
+    cout << endl << "options: " << endl;
+    cout << "- heuristic: " << (param.rz ? "siplified rz" : "random permutation") << endl;
+    cout << "- pivoting rule: " << (param.bestImp ? "best improvement" : "first improvement") << endl;
+    cout << "- neighborhood: ";
+    if(param.neighborhood == 0) {
+        cout << "transpose";
+    } else if(param.neighborhood == 1) {
+        cout << "exchange";
+    } else {
+        cout << "insert";
+    }
+    cout << endl << endl;
 
 }
 
@@ -382,6 +435,11 @@ int main(int argc, char *argv[])
   {
     cout << "Usage: ./flowshopWCT <instance_file>" << endl;
     return 0;
+  }
+
+  parameters param;
+  if(argc > 2) {
+      extractParameters(argv, argc, param);
   }
 
   /* initialize random seed: */
@@ -415,18 +473,20 @@ int main(int argc, char *argv[])
   // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
   // cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
 
-  cout << "simplified rz heuristic" << endl;
-  totalWeightedTardiness = rzHeuristic(instance, solution);
+  clock_t begin, end;
 
-  cout << "cost: " << totalWeightedTardiness << " vs " << instance.computeWCT(solution) << endl;
+  begin = clock();
+  iterativeImprovement(instance, solution, totalWeightedTardiness, param);
+  end = clock();
 
-  cout << endl << endl;
-  displaySolution(solution);
-
-  // iterativeImprovement(instance, solution, totalWeightedTardiness, true, 1, false);
-  // cout << endl << totalWeightedTardiness << endl;
+  cout << endl << "Best: " << totalWeightedTardiness << endl;
   // cout << instance.computeWCT(solution) << endl;
   // cout << instance.computePartialWCTN(solution, 1) << endl;
+
+  double t = (double)(end - begin) / CLOCKS_PER_SEC;
+  t *= 1000.;
+
+  cout << "Time: " << t << endl; 
 
   //transpose(solution, 2);
   //displaySolution(solution);

@@ -1,0 +1,18 @@
+
+options: 
+- heuristic: random permutation
+- pivoting rule: best improvement
+- neighborhood: insert
+
+name : 50_20_01
+file : ../instances/50_20_01
+File ../instances/50_20_01 is now open, start to read...
+Number of jobs : 50
+Number of machines : 20
+Allow memory for the matrix...
+Memory allowed.
+Start to read matrix...
+All is read from file.
+
+Best: 621713
+Time: 303.743
