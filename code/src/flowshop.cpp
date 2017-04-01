@@ -42,6 +42,9 @@ struct parameters {
     bool bestImp;
     bool rz;
     int neighborhood;
+
+    bool order; // for vnd heuristic
+    bool vnd;
 } param;
 
 /* display the solution */
@@ -374,12 +377,71 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
 
 }
 
+/* Variable neighbourhood Descent heuristic */
+void VNDHeuristic(PfspInstance& instance, vector< int > & sol, long int& cost, parameters& param) {
+
+    // initialization
+    if(param.rz) {
+        cost = rzHeuristic(instance, sol);
+    } else {
+        randomPermutation(instance.getNbJob(), sol);
+        cost = instance.computePartialWCT(sol, 1);
+    }
+
+    int neighbourhood = 1;
+    bool improvement;
+
+    do {
+
+        improvement = false;
+
+        // iterative improvement with a first improvement as pivoting rule
+        // neighbourhood depends on the parameter and the neighbourhood variable
+        if(neighbourhood == 1) {
+            improvement = transposeImprovement(instance, sol, cost, false);
+        } else if(neighbourhood == 2) {
+            if(param.order) {
+                improvement = insertImprovement(instance, sol, cost, false);
+            } else {
+                improvement = exchangeImprovement(instance, sol, cost, false);
+            }
+        } else if(neighbourhood == 3) {
+            if(param.order) {
+                improvement = exchangeImprovement(instance, sol, cost, false);
+            } else {
+                improvement = insertImprovement(instance, sol, cost, false);
+            }
+        }
+
+        // if there is an improvement, go back to the first neighbourhood
+        if(improvement) {
+            neighbourhood = 1;
+        } else {
+            neighbourhood ++;
+        }
+
+    } while(neighbourhood < 4);
+
+}
+
 /*----------------------------------------------------------------------------*/
 void extractParameters(char* cmd[], int nb, parameters& param) {
 
     string str;
     for(int i = 2; i < nb; i++) {
         str += cmd[i];
+    }
+
+    if(str.find("--vnd") != string::npos) {
+        param.vnd = true;
+    } else {
+        param.vnd = false;
+    }
+
+    if(param.vnd && str.find("--exfirst") != string::npos) {
+        param.order = true;
+    } else {
+        param.order = false;
     }
 
     if(str.find("--srz") != string::npos) {
@@ -409,16 +471,32 @@ void extractParameters(char* cmd[], int nb, parameters& param) {
     }
 
     cout << endl << "options: " << endl;
-    cout << "- heuristic: " << (param.rz ? "siplified rz" : "random permutation") << endl;
-    cout << "- pivoting rule: " << (param.bestImp ? "best improvement" : "first improvement") << endl;
-    cout << "- neighborhood: ";
-    if(param.neighborhood == 0) {
-        cout << "transpose";
-    } else if(param.neighborhood == 1) {
-        cout << "exchange";
-    } else {
-        cout << "insert";
+    if(param.vnd) {
+        cout << "- Variable Neighbourhood Descent heuristic" << endl;
     }
+
+    cout << "- initialization: " << (param.rz ? "siplified rz" : "random permutation") << endl;
+
+    if(!param.vnd) {
+        cout << "- pivoting rule: " << (param.bestImp ? "best improvement" : "first improvement") << endl;
+        cout << "- neighborhood: ";
+        if(param.neighborhood == 0) {
+            cout << "transpose";
+        } else if(param.neighborhood == 1) {
+            cout << "exchange";
+        } else {
+            cout << "insert";
+        }
+    } else {
+        cout << "-neighbourhood order: " << endl;
+        cout << "\ttranspose ; ";
+        if(param.order) {
+            cout << "exchange ; insert" << endl;
+        } else {
+            cout << "insert ; exchange" << endl;
+        }
+    }
+
     cout << endl << endl;
 
 }
@@ -457,6 +535,11 @@ int main(int argc, char *argv[])
              thus the size nbJob + 1. */
   vector< int > solution ( instance.getNbJob()+ 1 );
 
+// randomPermutation(instance.getNbJob(), solution);
+cout << "rz : " << rzHeuristic(instance, solution) << endl;
+cout << "solution rz : " << endl;
+displaySolution(solution);
+
   /* Fill the vector with a random permutation */
   /*randomPermutation(instance.getNbJob(), solution);
 
@@ -476,7 +559,13 @@ int main(int argc, char *argv[])
   clock_t begin, end;
 
   begin = clock();
-  iterativeImprovement(instance, solution, totalWeightedTardiness, param);
+
+  if(param.vnd) {
+      VNDHeuristic(instance, solution, totalWeightedTardiness, param);
+  } else {
+      iterativeImprovement(instance, solution, totalWeightedTardiness, param);
+  }
+
   end = clock();
 
   cout << endl << "Best: " << totalWeightedTardiness << endl;
@@ -486,7 +575,7 @@ int main(int argc, char *argv[])
   double t = (double)(end - begin) / CLOCKS_PER_SEC;
   t *= 1000.;
 
-  cout << "Time: " << t << endl; 
+  cout << "Time: " << t << endl;
 
   //transpose(solution, 2);
   //displaySolution(solution);
