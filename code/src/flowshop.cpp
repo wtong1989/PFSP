@@ -440,6 +440,8 @@ void extractParameters(char* cmd[], int nb, parameters& param) {
 
     if(param.vnd && str.find("--exfirst") != string::npos) {
         param.order = true;
+    } else if(param.vnd && str.find("--insfirst") != string::npos) {
+        param.order = false;
     } else {
         param.order = false;
     }
@@ -521,7 +523,7 @@ int main(int argc, char *argv[])
   }
 
   /* initialize random seed: */
-  srand ( time(NULL) );
+  srand ( 42 );
 
   /* Create instance object */
   PfspInstance instance;
@@ -535,31 +537,11 @@ int main(int argc, char *argv[])
              thus the size nbJob + 1. */
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-// randomPermutation(instance.getNbJob(), solution);
-cout << "rz : " << rzHeuristic(instance, solution) << endl;
-cout << "solution rz : " << endl;
-displaySolution(solution);
-
-  /* Fill the vector with a random permutation */
-  /*randomPermutation(instance.getNbJob(), solution);
-
-  cout << "Random solution: " ;
-  for (i = 1; i <= instance.getNbJob(); ++i)
-    cout << solution[i] << " " ;
-  cout << endl;*/
-
-  /* Compute the TWT of this solution */
-  // totalWeightedTardiness = instance.computeWCT(solution);
-  // cout << "Total weighted completion time: " << totalWeightedTardiness << endl;
-
-  // cout << "test : " << instance.computePartialWCT(solution, 1) << endl;
-  // cout << "test2 : " << instance.computePartialWCT(solution, 1) << endl;
-  // cout << "test3 : " << instance.computePartialWCTN(solution, 3) << endl;
-
   clock_t begin, end;
 
   begin = clock();
 
+  // apply the chosen heuristic
   if(param.vnd) {
       VNDHeuristic(instance, solution, totalWeightedTardiness, param);
   } else {
