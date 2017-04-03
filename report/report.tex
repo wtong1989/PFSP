@@ -1,0 +1,47 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+
+\usepackage{a4wide}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+
+\usepackage{hyperref}
+
+
+\title{Heuristic Optimization: implementation exercise 1}
+\author{Samuel Buchet}
+\date{March 2017}
+
+\begin{document}
+
+\maketitle
+
+\section{PFSP problem}
+
+This first implementation exercise consists in working on the Permutation Flow-shop Scheduling Problem with two heuristic methods: iterative improvement and variable neighborhood descent.
+
+\section{Iterative improvement heuristic}
+
+\subsection{Implementation details}
+
+The implementation has been done in c++ from the sample code.
+One improvement function has been written for each neighborhood.
+The improvement functions take a parameter that decides the pivoting rule (first or best improvement).
+For the first improvement rule, after a new improvement, the algorithm doesn't restart the search from the first neighbour, as seen in class. \newline
+
+One of the main difficulty of the implmentation was the computation of the cost of a solution (weighted completion times). The easiest way is to compute the entire time, starting from the first job. However, it takes a lot of time and it is not always necessary. For example, if only the last two jobs are modifier in the solution, only the last two completion times need to be re-computed.  
+
+\section{Variable Neighborhood Descent heuristic}
+
+\subsection{Implementation}
+
+
+
+\end{document}
