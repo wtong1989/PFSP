@@ -224,19 +224,49 @@ This step is reapeted until there is no improvement in the last neighborood.
 
 \subsection{Results}
 
-instances,avg ctime,avg rdp
-
+The table below contains the average of the computation time, the average of the percentage deviation of the solution, the average of the percentage improvement over the exchange neighborhood and the average of the percentage improvement over the insert neighborhood. The order used for the neighborhood is transpose - exchange - insert and transpose - insert - exchange. ex. first means that the exchange neighbohood use applied before the insert neighborhood.
 
 \begin{align*}
 \begin{tabular} {|c|c|c|c|c|} \hline
 algorithm & average compution time & avg percentage deviation & avg imp exchange & avg imp. insert \\ \hline
 random ; ex. first & 382.526 & 2.634 & 0.006 & 0.0003 \\ \hline
 random ; ins. first & 307.123 & 2.091 & 0.011 & 0.006 \\ \hline
-srz ; ex. first & 275.016 & 2.129 & 0.010 & 0.0005 \\ \hline
-srz ; ins. first & 283.463 & 2.161 & 0.010 & 0.0002 \\ \hline
+srz ; exchange first & 275.016 & 2.129 & 0.010 & 0.0005 \\ \hline
+srz ; insert first & 283.463 & 2.161 & 0.010 & 0.0002 \\ \hline
 \end{tabular}
 \end{align*}
 
+\subsection{Statistical tests}
+
+The table below contains the p-values obtained with a Wilcoxon test on the two vnd algorithms for the quality of the solution and the computation time.
+
+\begin{align*}
+\begin{tabular}{|c|c|c|} \hline
+    algorithm & computation time & percentage deviation \\ \hline
+    srz & 0.1720717 & 0.6274306 \\ \hline
+    random & 0.000156713 & 0.0001869606 \\ \hline
+\end{tabular}
+\end{align*}
+
+The tests indicate that there is no statistically significant differences between the solution qualities and the computation times for the srz heuristic.
+However, for the random permutation as initial solution, there is a difference.
+For the random permutation, the average of the computation time and the average of the percentage deviation are lower with the insert neighborhood before the exchange neighborhood.
+We can conclude that this order is better.
+
 \section{Compilation and execution}
+
+To compile the project, make sure you are in the \textit{code} folder and type the \textit{make} command. \newline
+
+To execute the program, type \textit{./flowshopWCT} in the terminal. You need to specify a valid instance.
+You can also specify options to chose the neighborhood, the pivoting rule and the initialization of the solution.
+For example, the command \textit{./flowshopWCT yourInstance $--$srz $--$first $--$insert} executes an iterative improvement algorithm with the simplified rz heuristic as initial solution, the first improvement as pivoting rule and the insert neighborhood. Here are all the options available: \newline
+
+\begin{itemize}
+    \item neighborhood: $--$insert, $--$exchange, $--$tranpose
+    \item initial solution: $--$srz, $--$random
+    \item pivoting rule: $--$first, $--$best
+\end{itemize}
+
+You can also execute a vnd algorithm. To do that, use the $--$vnd option. To chose the order of the neighborhood, you can precise $--$exFirst and $--$insFirst. And you can still indicate which initial solution to use (vnd uses first improvement rule).
 
 \end{document}
