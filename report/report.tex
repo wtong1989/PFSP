@@ -10,8 +10,6 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 
-\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
-
 \usepackage{hyperref}
 
 
@@ -23,10 +21,6 @@
 
 \maketitle
 
-\section{PFSP problem}
-
-This first implementation exercise consists in working on the Permutation Flow-shop Scheduling Problem with two heuristic methods: iterative improvement and variable neighborhood descent.
-
 \section{Iterative improvement heuristic}
 
 \subsection{Implementation details}
@@ -34,44 +28,44 @@ This first implementation exercise consists in working on the Permutation Flow-s
 The implementation has been done in c++ from the sample code.
 One improvement function has been written for each neighborhood.
 The improvement functions take a parameter that decides the pivoting rule (first or best improvement).
-For the first improvement rule, after a new improvement, the algorithm doesn't restart the search from the first neighbour, as seen in class. \newline
+For the first improvement rule, after a new improvement, the algorithm doesn't restart the search from the first neighbor, as seen in class. \newline
 
-One of the main difficulty of the implmentation was the computation of the cost of a solution (weighted completion times). The easiest way is to compute the entire completion time, starting from the first job.
+One of the main difficulty of the implmentation was the computation of the cost of a solution (weighted completion times sum). The easiest way is to compute the entire sum, starting from the first job.
 However, it takes a lot of time and it is not always necessary.
 For example, if only the last two jobs are modified in the solution, only the last two completion times need to be re-computed.
 To recompute only a part of the solution cost, it is necessary to keep the completion times of each job for each machine.
 These times are saved in a matrix in the \textit{PfspInstance} class.
-Thanks to this matrix, two functions of the class PfspInstance are available to compute the completion time, one that computes the the total weighted sum and modify the matrix, and another which compute the sum without modifying the matrix.\newline
+Thanks to this matrix, two functions of the class PfspInstance are available to compute the completion time, one that computes the the total weighted sum and modify the matrix, and another that computes the sum without modifying the matrix.\newline
 
-These two functions are used in the iterative improvement procedure.
-One iterative improvement function have been written for each neighborhood.
+These two functions are used in the iterative improvement procedures.
+The iterative improvement functions have been written for each neighborhood.
 The procedures iterate over all neighbours.
-If the pivoting rule is the best improvement rule, the best neighbor is saved and the change is done at the end of the loop.
+If the pivoting rule is the best improvement rule, the best neighbor is saved and the change is done at the end of the procedure.
 If the pivoting rule is the first improvement rule, each time an improving neighbor is found, the change is done and the search continue with the new solution. \newline
 
 The transpose improvement procedure is the easiest in the sense that there is no nested loop.
 In this procedure, all the possible transpose moves are tried on the solution.
 As explained below, it is not necessary to recompute the wighted sum from the first job if the transpose move is not done at the begining of the solution.
 However, to do so, the matrix of the completion times of the \textit{initial} solution has to be kept.
-Thats why the procedure used to compute the weighted sum of a neighbor doesn't modify the matrix.
-If the pivoting rule is the first improvement rule and the neighbor improve the solution, the cost is re-computed in order to apply the changes on the completion times matrix. \newline
+That's why the procedure used to compute the weighted sum of a neighbor doesn't modify the matrix.
+If the pivoting rule is the first improvement rule and the neighbor improve the solution, the cost is re-computed in order to apply the changes on the completion times matrix (with a second procedure which modify the completion times matrix). \newline
 
 The exchange improvement procedure is very similar.
 The only difference is the nested loop.
 It is then obvious that this neighborhood is longer to compute than the transpose one.
 The insert procedure is also similar.
 However, the insertion is properly done only once.
-For a given element, the procedure insert it in the first position and the other positions are tried with transpose moves, wich is equivalent.
-However, the procedure try the original position of the element and nothing has been done to prevent this case. \newline
+For a given element, the procedure insert it in the first position and the other positions are obained with transpose moves, which is equivalent.
+However, the procedure tries the original position of the element and nothing has been done to prevent this case. \newline
 
-All these improvement procedures return a boolean that indicates wether an improving solution has been found or not.
+All these improvement procedures return a boolean that indicates whether an improving solution has been found or not.
 This boolean is used in the iterative improvement procedure to stop the algorithm.
-The iterative improvement procedure also init the solution with the random permutation or the simplified rz heuristic.
+The iterative improvement procedure also initialize the solution with the random permutation or the simplified rz heuristic, depending on the parameters of the algorithm.
 
-\subsection{Results}
+\subsection{Experiments}
 
-The following table report the average of the computation times and the average of the percentage deviation from the best known solution for each algorithm.
-bestImp means that the pivoting rule is the best improvement rule and firstImp corresponds to the first improvement rule.
+The following table reports the average of the computation times and the average of the percentage deviations from the best known solution for each algorithm.
+best. imp means that the pivoting rule is the best improvement rule and first imp. corresponds to the first improvement rule.
 random means that the solution is initialized with a random permutation and srz means that the simplified rz heuristic has been used.
 The last parameter is the neighborhood used in the algorithm.
 
@@ -100,7 +94,7 @@ The algorithms with the insert neighborhood are also the slowest.
 
 \subsection{Statistical tests}
 
-The following statistical tests have been done using R. The statistical test used is the Wilcoxon test with a significance level equal to $0.05$.
+The following statistical tests have been done using the software R. The statistical test used is the Wilcoxon test with a significance level equal to $0.05$.
 
 \subsubsection{Initial solution}
 
@@ -154,13 +148,13 @@ The table below contains the result od the statistical tests applied to the comp
 \end{tabular}
 \end{align*}
 
-For each pair of algorithms, there is a statistically significant difference beteween the computions times.
+For each pair of algorithms, there is a statistically significant difference beteween the compution times.
 The average of the computation times is lower for the first improvement algorithm for each pairs.
 We can conclude that the first improvement algorithms are faster and there is no big differences between the quality of the solutions.
 
 \subsubsection{Neighborhood}
 
-In this section, the different neighborhood are compared. Comparisons are done for each pair of neghborhood (transpose/exchange, transpose/insert, exchange/insert). The p-value returned by the test is indicated in the tables below. \newline
+In this section, the different neighborhoods are compared. Comparisons are done for each pair of neghborhood (transpose/exchange, transpose/insert, exchange/insert). The p-value returned by the tests of the computation times and the solution quality are indicated in the tables below. \newline
 
 Comparison between the transpose neighborhood and the exchange neighborhood:
 
@@ -202,27 +196,28 @@ We can see that for each comparison, the null hypothesis is rejected.
 There is a statistically significant difference between the neighborhood in terms of quality and computation time. \newline
 
 %transpos/exchange
-For each pairs of algorithms, we can see on the table in 2.2 that in average the transpose neighborhood is faster but the quality of the solution found by the exchange neighborhood is better. \newline
+For each pair of algorithm, we can see on the table in 2.2 that in average the transpose neighborhood is faster but the quality of the solution found by the exchange neighborhood is better. \newline
 
 %transpose/insert
-If we compare the transpose and the insert neighborhoods, we can see that once again, the transpose neighborhood is the faster one but its quality is worst than the insert neighborhood in average. \newline
+If we compare the transpose and the insert neighborhoods, we can see that once again, the transpose neighborhood is faster but its quality is worst than the insert neighborhood in average. \newline
 
 %exchange/insert
 The comparison of average values between the exchange neighborood and the insert neighborhood indicates that the insert neighborhood is slower than the exchange neighborhood but the quality of its solution is better. \newline
 
-To conclude, the insert neighborhood is the one that generates the best solution in terms of quality. However, the transpose is the faster neighborhood. The exchange neighbohood is a good tradeoff because it is faster than the insert one and its quality is better than the transpose one.
+To conclude, the insert neighborhood is the one that generates the best solutions in terms of quality.
+However, the transpose neighborhood is the fastest neighborhood. The exchange neighbohood is a good tradeoff because it is faster than the insert one and its quality is better than the transpose one.
 
 \section{Variable Neighborhood Descent heuristic}
 
 \subsection{Implementation details}
 
-The implementation of the VND algorithm mainly uses the procedures created for the iterative improvement algorithm.
-The algorithm has been implmented in the \textit{VNDHeuristic} procedure.
-It first init the solution with the chosen initialization algorithm.
+The implementation of the VND algorithm mainly uses the procedures created for the iterative improvement algorithms.
+The algorithm has been implemented in the \textit{VNDHeuristic} procedure.
+It first initialize the solution with the chosen initialization algorithm.
 Then, it applies successively the different iterative improvement procedures following the chosen order of the neighbohoods.
-This step is reapeted until there is no improvement in the last neighborood.
+This step is repeated until there is no improvement in the last neighborhood.
 
-\subsection{Results}
+\subsection{Experiments}
 
 The table below contains the average of the computation time, the average of the percentage deviation of the solution, the average of the percentage improvement over the exchange neighborhood and the average of the percentage improvement over the insert neighborhood. The order used for the neighborhood is transpose - exchange - insert and transpose - insert - exchange. ex. first means that the exchange neighbohood use applied before the insert neighborhood.
 
@@ -238,7 +233,7 @@ srz ; insert first & 283.463 & 2.161 & 0.010 & 0.0002 \\ \hline
 
 \subsection{Statistical tests}
 
-The table below contains the p-values obtained with a Wilcoxon test on the two vnd algorithms for the quality of the solution and the computation time.
+The table below contains the p-values obtained with a Wilcoxon test on the vnd algorithms for the quality of the solution and the computation time.
 
 \begin{align*}
 \begin{tabular}{|c|c|c|} \hline
@@ -252,13 +247,14 @@ The tests indicate that there is no statistically significant differences betwee
 However, for the random permutation as initial solution, there is a difference.
 For the random permutation, the average of the computation time and the average of the percentage deviation are lower with the insert neighborhood before the exchange neighborhood.
 We can conclude that this order is better.
+However, regarding the comparison between vnd and the iterative improvement algorithms, the improvement of vnd seems to be very low. 
 
 \section{Compilation and execution}
 
 To compile the project, make sure you are in the \textit{code} folder and type the \textit{make} command. \newline
 
 To execute the program, type \textit{./flowshopWCT} in the terminal. You need to specify a valid instance.
-You can also specify options to chose the neighborhood, the pivoting rule and the initialization of the solution.
+You can also specify options to choose the neighborhood, the pivoting rule and the initialization of the solution.
 For example, the command \textit{./flowshopWCT yourInstance $--$srz $--$first $--$insert} executes an iterative improvement algorithm with the simplified rz heuristic as initial solution, the first improvement as pivoting rule and the insert neighborhood. Here are all the options available: \newline
 
 \begin{itemize}
@@ -267,6 +263,6 @@ For example, the command \textit{./flowshopWCT yourInstance $--$srz $--$first $-
     \item pivoting rule: $--$first, $--$best
 \end{itemize}
 
-You can also execute a vnd algorithm. To do that, use the $--$vnd option. To chose the order of the neighborhood, you can precise $--$exFirst and $--$insFirst. And you can still indicate which initial solution to use (vnd uses first improvement rule).
+You can also execute a vnd algorithm. To do that, use the $--$vnd option. To choose the order of the neighborhood, you can precise $--$exFirst and $--$insFirst. And you can still indicate which initial solution to use (vnd uses first improvement rule).
 
 \end{document}

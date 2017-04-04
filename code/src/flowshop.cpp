@@ -161,7 +161,6 @@ long int rzHeuristic(PfspInstance& instance, vector<int>& sol) {
 
         for(int j = i-1; j >= 1; j--) {
 
-            // sol.at(j) = weightedSum.at(i-1).job;
             transpose(sol, j);
             // compute partial score
             long int cost = instance.computePartialWCTN(sol, j, i);
@@ -252,6 +251,7 @@ bool exchangeImprovement(PfspInstance& instance, vector<int>& sol, long int& cos
         }
     }
 
+    // in best improvement, we jump to the best solution found
     if(bestImp && bestNewCost < cost) {
         improve = true;
         exchange(sol, bestPosA, bestPosB);
@@ -420,10 +420,12 @@ void VNDHeuristic(PfspInstance& instance, vector< int > & sol, long int& cost, p
             neighbourhood ++;
         }
 
+        // the algorithm stops when no improvement has been found in the last neighborhood
     } while(neighbourhood < 4);
 
 }
 
+// setup the param data structure with the command line parameters
 /*----------------------------------------------------------------------------*/
 void extractParameters(char* cmd[], int nb, parameters& param) {
 
@@ -551,16 +553,11 @@ int main(int argc, char *argv[])
   end = clock();
 
   cout << endl << "Best: " << totalWeightedTardiness << endl;
-  // cout << instance.computeWCT(solution) << endl;
-  // cout << instance.computePartialWCTN(solution, 1) << endl;
 
   double t = (double)(end - begin) / CLOCKS_PER_SEC;
   t *= 1000.;
 
   cout << "Time: " << t << endl;
-
-  //transpose(solution, 2);
-  //displaySolution(solution);
 
   return 0;
 }
