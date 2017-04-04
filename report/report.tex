@@ -140,7 +140,7 @@ This first table contains the results of the tests applied to the average of the
 We can see that there is a statistically significant difference only with two algorithms (which don't use the best initial solution).
 Moreover, for these two pairs of algorithms, the first improvement rule seems to give better results. \newline
 
-The table bellow contains the result od the statistical tests applied to the computation times.
+The table below contains the result od the statistical tests applied to the computation times.
 
 \begin{align*}
 \begin{tabular} {|c|c|c|} \hline
@@ -160,17 +160,17 @@ We can conclude that the first improvement algorithms are faster and there is no
 
 \subsubsection{Neighborhood}
 
-In this section, the different neighborhood are compared. Comparisons are done for each pair of neghborhood (transpose/exchange, transpose/insert, exchange/insert). \newline
+In this section, the different neighborhood are compared. Comparisons are done for each pair of neghborhood (transpose/exchange, transpose/insert, exchange/insert). The p-value returned by the test is indicated in the tables below. \newline
 
 Comparison between the transpose neighborhood and the exchange neighborhood:
 
 \begin{align*}
 \begin{tabular} {|c|c|c|c|c|} \hline
     algorithms compared & relative percentage deviation & computation time \\ \hline
-    first imp. ; random & & \\ \hline
-    first imp. ; srz & & \\ \hline
-    best imp. ; random & & \\ \hline
-    best imp. ; srz & & \\ \hline
+    first imp. ; random & 1.671329e-11 & 1.671329e-11 \\ \hline
+    first imp. ; srz & 5.282725e-11 & 1.671329e-11 \\ \hline
+    best imp. ; random & 1.671329e-11 & 1.671329e-11 \\ \hline
+    best imp. ; srz & 1.138656e-10 & 1.671329e-11 \\ \hline
 \end{tabular}
 \end{align*}
 
@@ -179,10 +179,10 @@ Comparison between the transpose neighborhood and the insert neighborhood:
 \begin{align*}
 \begin{tabular} {|c|c|c|c|c|} \hline
     algorithms compared & relative percentage deviation & computation time \\ \hline
-    first imp. ; random & & \\ \hline
-    first imp. ; srz & & \\ \hline
-    best imp. ; random & & \\ \hline
-    best imp. ; srz & & \\ \hline
+    first imp. ; random & 1.671329e-11 & 1.671329e-11 \\ \hline
+    first imp. ; srz & 1.671329e-11 & 1.671329e-11 \\ \hline
+    best imp. ; random & 1.671329e-11 & 1.671329e-11 \\ \hline
+    best imp. ; srz & 1.671329e-11 & 1.671329e-11 \\ \hline
 \end{tabular}
 \end{align*}
 
@@ -191,16 +191,51 @@ Comparison between the exchange and the insert neighborhood:
 \begin{align*}
 \begin{tabular} {|c|c|c|c|c|} \hline
     algorithms compared & relative percentage deviation & computation time \\ \hline
-    first imp. ; random & & \\ \hline
-    first imp. ; srz & & \\ \hline
-    best imp. ; random & & \\ \hline
-    best imp. ; srz & & \\ \hline
+    first imp. ; random & 0.0006803447 & 1.671329e-11 \\ \hline
+    first imp. ; srz & 2.115717e-09 & 1.671329e-11 \\ \hline
+    best imp. ; random & 1.345635e-06 & 1.671329e-11 \\ \hline
+    best imp. ; srz & 7.033074e-10 & 1.671329e-11 \\ \hline
 \end{tabular}
 \end{align*}
 
+We can see that for each comparison, the null hypothesis is rejected.
+There is a statistically significant difference between the neighborhood in terms of quality and computation time. \newline
+
+%transpos/exchange
+For each pairs of algorithms, we can see on the table in 2.2 that in average the transpose neighborhood is faster but the quality of the solution found by the exchange neighborhood is better. \newline
+
+%transpose/insert
+If we compare the transpose and the insert neighborhoods, we can see that once again, the transpose neighborhood is the faster one but its quality is worst than the insert neighborhood in average. \newline
+
+%exchange/insert
+The comparison of average values between the exchange neighborood and the insert neighborhood indicates that the insert neighborhood is slower than the exchange neighborhood but the quality of its solution is better. \newline
+
+To conclude, the insert neighborhood is the one that generates the best solution in terms of quality. However, the transpose is the faster neighborhood. The exchange neighbohood is a good tradeoff because it is faster than the insert one and its quality is better than the transpose one.
+
 \section{Variable Neighborhood Descent heuristic}
 
-\subsection{Implementation}
+\subsection{Implementation details}
+
+The implementation of the VND algorithm mainly uses the procedures created for the iterative improvement algorithm.
+The algorithm has been implmented in the \textit{VNDHeuristic} procedure.
+It first init the solution with the chosen initialization algorithm.
+Then, it applies successively the different iterative improvement procedures following the chosen order of the neighbohoods.
+This step is reapeted until there is no improvement in the last neighborood.
+
+\subsection{Results}
+
+instances,avg ctime,avg rdp
+
+
+\begin{align*}
+\begin{tabular} {|c|c|c|c|c|} \hline
+algorithm & average compution time & avg percentage deviation & avg imp exchange & avg imp. insert \\ \hline
+random ; ex. first & 382.526 & 2.634 & 0.006 & 0.0003 \\ \hline
+random ; ins. first & 307.123 & 2.091 & 0.011 & 0.006 \\ \hline
+srz ; ex. first & 275.016 & 2.129 & 0.010 & 0.0005 \\ \hline
+srz ; ins. first & 283.463 & 2.161 & 0.010 & 0.0002 \\ \hline
+\end{tabular}
+\end{align*}
 
 \section{Compilation and execution}
 
