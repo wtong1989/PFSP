@@ -1,0 +1,5 @@
+instances,avg ctime,avg rdp
+pfsp-vnd---random--exfirst.txt,382.525966666667,2.63398808540614
+pfsp-vnd---random--insfirst.txt,307.122783333333,2.09125908213085
+pfsp-vnd---srz--exfirst.txt,275.015933333333,2.12893163954244
+pfsp-vnd---srz--insfirst.txt,283.463083333333,2.16113867928897

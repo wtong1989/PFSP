@@ -36,12 +36,172 @@ One improvement function has been written for each neighborhood.
 The improvement functions take a parameter that decides the pivoting rule (first or best improvement).
 For the first improvement rule, after a new improvement, the algorithm doesn't restart the search from the first neighbour, as seen in class. \newline
 
-One of the main difficulty of the implmentation was the computation of the cost of a solution (weighted completion times). The easiest way is to compute the entire time, starting from the first job. However, it takes a lot of time and it is not always necessary. For example, if only the last two jobs are modifier in the solution, only the last two completion times need to be re-computed.  
+One of the main difficulty of the implmentation was the computation of the cost of a solution (weighted completion times). The easiest way is to compute the entire completion time, starting from the first job.
+However, it takes a lot of time and it is not always necessary.
+For example, if only the last two jobs are modified in the solution, only the last two completion times need to be re-computed.
+To recompute only a part of the solution cost, it is necessary to keep the completion times of each job for each machine.
+These times are saved in a matrix in the \textit{PfspInstance} class.
+Thanks to this matrix, two functions of the class PfspInstance are available to compute the completion time, one that computes the the total weighted sum and modify the matrix, and another which compute the sum without modifying the matrix.\newline
+
+These two functions are used in the iterative improvement procedure.
+One iterative improvement function have been written for each neighborhood.
+The procedures iterate over all neighbours.
+If the pivoting rule is the best improvement rule, the best neighbor is saved and the change is done at the end of the loop.
+If the pivoting rule is the first improvement rule, each time an improving neighbor is found, the change is done and the search continue with the new solution. \newline
+
+The transpose improvement procedure is the easiest in the sense that there is no nested loop.
+In this procedure, all the possible transpose moves are tried on the solution.
+As explained below, it is not necessary to recompute the wighted sum from the first job if the transpose move is not done at the begining of the solution.
+However, to do so, the matrix of the completion times of the \textit{initial} solution has to be kept.
+Thats why the procedure used to compute the weighted sum of a neighbor doesn't modify the matrix.
+If the pivoting rule is the first improvement rule and the neighbor improve the solution, the cost is re-computed in order to apply the changes on the completion times matrix. \newline
+
+The exchange improvement procedure is very similar.
+The only difference is the nested loop.
+It is then obvious that this neighborhood is longer to compute than the transpose one.
+The insert procedure is also similar.
+However, the insertion is properly done only once.
+For a given element, the procedure insert it in the first position and the other positions are tried with transpose moves, wich is equivalent.
+However, the procedure try the original position of the element and nothing has been done to prevent this case. \newline
+
+All these improvement procedures return a boolean that indicates wether an improving solution has been found or not.
+This boolean is used in the iterative improvement procedure to stop the algorithm.
+The iterative improvement procedure also init the solution with the random permutation or the simplified rz heuristic.
+
+\subsection{Results}
+
+The following table report the average of the computation times and the average of the percentage deviation from the best known solution for each algorithm.
+bestImp means that the pivoting rule is the best improvement rule and firstImp corresponds to the first improvement rule.
+random means that the solution is initialized with a random permutation and srz means that the simplified rz heuristic has been used.
+The last parameter is the neighborhood used in the algorithm.
+
+\begin{align*}
+\begin{tabular} {|c|c|c|} \hline
+    algorithm & average computation time & average percentage deviation \\ \hline
+    best imp./random/exchange & 919.706 & 4.383 \\ \hline
+    best imp./random/insert & 2721.295 & 3.242 \\ \hline
+    best imp./random/transpose & 12.753 & 36.135 \\ \hline
+    best imp./srz/exchange & 239.501 & 3.157 \\ \hline
+    best imp./srz/insert & 872.557 & 2.231 \\ \hline
+    best imp./srz/transpose & 7.757 & 4.304 \\ \hline
+    first imp./random/exchange & 93.031 & 3.252 \\ \hline
+    first imp./random/insert & 292.007 & 2.676 \\ \hline
+    first imp./random/transpose & 1.963 & 36.163 \\ \hline
+    first imp./srz/exchange & 80.713 & 3.153 \\ \hline
+    first imp./srz/insert & 215.415 & 2.185 \\ \hline
+    first imp./srz/transpose & 7.216 & 4.306 \\ \hline
+\end{tabular}
+\end{align*}
+
+We can see that some algorithms seem to be much worst.
+Indeed, the average percentage deviation is quite high for the algorithms using random and transpose parameters.
+We can also notice that the algorithms using the transpose neighborhood are much faster.
+The algorithms with the insert neighborhood are also the slowest.
+
+\subsection{Statistical tests}
+
+The following statistical tests have been done using R. The statistical test used is the Wilcoxon test with a significance level equal to $0.05$.
+
+\subsubsection{Initial solution}
+
+The following table shows the result of the test applied to all pairs of algorithms which differ only between the initial solution.
+
+\begin{align*}
+\begin{tabular} {|c|c|c|} \hline
+    algorithms compared & p-value & null hypothesis \\ \hline
+    best imp. ; exchange & 6.173616e-09 & rejected \\ \hline
+    best imp. ; insert & 6.35434e-07 & rejected \\ \hline
+    best imp. ; transpose & 1.671329e-11 & rejected \\ \hline
+    first imp. ; exchange & 0.5339054 & not rejected \\ \hline
+    first imp. ; insert & 0.0005783928 & rejected \\ \hline
+    first imp. ; transpose & 1.671329e-11 & rejected \\ \hline
+\end{tabular}
+\end{align*}
+
+For most of the tests, the null hypothesis is rejected, which means that there is a statistically significant difference between the solution quality. Moreover, with the srz heuristic, the average of the percentage deviation is lower for each algorithm. We can then conclude that the simplified rz heuristic gives better results than the random permutation.
+
+\subsubsection{Pivoting rule}
+
+In this section, the test has been applied to all pairs of algorithms which differ only between the pivoting rule.
+This first table contains the results of the tests applied to the average of the percentage deviation.
+
+\begin{align*}
+\begin{tabular} {|c|c|c|} \hline
+    algorithms compared & p-value & null hypothesis \\ \hline
+    random ; exchange & 6.147428e-08 & rejected \\ \hline
+    random ; insert & 0.001416562 & rejected \\ \hline
+    random ; transpose & 0.7100708 & not rejected \\ \hline
+    srz ; exchange & 0.6481444 & not rejected \\ \hline
+    srz ; insert & 0.463876 & not rejected \\ \hline
+    srz ; transpose & 0.9878667 & not rejected \\ \hline
+\end{tabular}
+\end{align*}
+
+We can see that there is a statistically significant difference only with two algorithms (which don't use the best initial solution).
+Moreover, for these two pairs of algorithms, the first improvement rule seems to give better results. \newline
+
+The table bellow contains the result od the statistical tests applied to the computation times.
+
+\begin{align*}
+\begin{tabular} {|c|c|c|} \hline
+    algorithms compared & p-value & null hypothesis \\ \hline
+    random ; exchange & 1.671329e-11 & rejected \\ \hline
+    random ; insert & 1.671329e-11 & rejected \\ \hline
+    random ; transpose & 1.671329e-11 & rejected \\ \hline
+    srz ; exchange &5.278219e-11  & rejected \\ \hline
+    srz ; insert & 1.671329e-11 & rejected \\ \hline
+    srz ; transpose & 3.163469e-06 & rejected \\ \hline
+\end{tabular}
+\end{align*}
+
+For each pair of algorithms, there is a statistically significant difference beteween the computions times.
+The average of the computation times is lower for the first improvement algorithm for each pairs.
+We can conclude that the first improvement algorithms are faster and there is no big differences between the quality of the solutions.
+
+\subsubsection{Neighborhood}
+
+In this section, the different neighborhood are compared. Comparisons are done for each pair of neghborhood (transpose/exchange, transpose/insert, exchange/insert). \newline
+
+Comparison between the transpose neighborhood and the exchange neighborhood:
+
+\begin{align*}
+\begin{tabular} {|c|c|c|c|c|} \hline
+    algorithms compared & relative percentage deviation & computation time \\ \hline
+    first imp. ; random & & \\ \hline
+    first imp. ; srz & & \\ \hline
+    best imp. ; random & & \\ \hline
+    best imp. ; srz & & \\ \hline
+\end{tabular}
+\end{align*}
+
+Comparison between the transpose neighborhood and the insert neighborhood:
+
+\begin{align*}
+\begin{tabular} {|c|c|c|c|c|} \hline
+    algorithms compared & relative percentage deviation & computation time \\ \hline
+    first imp. ; random & & \\ \hline
+    first imp. ; srz & & \\ \hline
+    best imp. ; random & & \\ \hline
+    best imp. ; srz & & \\ \hline
+\end{tabular}
+\end{align*}
+
+Comparison between the exchange and the insert neighborhood:
+
+\begin{align*}
+\begin{tabular} {|c|c|c|c|c|} \hline
+    algorithms compared & relative percentage deviation & computation time \\ \hline
+    first imp. ; random & & \\ \hline
+    first imp. ; srz & & \\ \hline
+    best imp. ; random & & \\ \hline
+    best imp. ; srz & & \\ \hline
+\end{tabular}
+\end{align*}
 
 \section{Variable Neighborhood Descent heuristic}
 
 \subsection{Implementation}
 
-
+\section{Compilation and execution}
 
 \end{document}

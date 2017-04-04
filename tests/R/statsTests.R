@@ -31,10 +31,10 @@ for(i in 1:(length(infiles)-1)) {
 
 		res[cpt,1] <- paste(infiles[i], infiles[j], sep="/");
 		pv <- wilcox.test(a[,1], b[,1], paired=T)$p.value;
-		res[cpt, 2] <- pv;
+		res[cpt, 2] <- pv >= 0.05;
 
 		pv <- t.test(a[,1], b[,1], paired=T)$p.value;
-		res[cpt, 3] <- pv;
+		res[cpt, 3] <- pv >= 0.05;
 
 
 		cpt <- cpt+1;

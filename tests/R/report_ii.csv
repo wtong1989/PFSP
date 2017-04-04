@@ -1,0 +1,13 @@
+instances,avg ctime,avg rdp
+pfsp-ii---bestImp--random--exchange.txt,919.70585,4.38347573210585
+pfsp-ii---bestImp--random--insert.txt,2721.2947,3.24202846297987
+pfsp-ii---bestImp--random--transpose.txt,12.75305,36.1354901731817
+pfsp-ii---bestImp--srz--exchange.txt,239.501466666667,3.15698810045769
+pfsp-ii---bestImp--srz--insert.txt,872.55705,2.23139484792048
+pfsp-ii---bestImp--srz--transpose.txt,7.75728333333333,4.30359557487944
+pfsp-ii---firstImp--random--exchange.txt,93.0307,3.25244096421726
+pfsp-ii---firstImp--random--insert.txt,292.007016666667,2.67607757122
+pfsp-ii---firstImp--random--transpose.txt,1.96251666666667,36.1634943854326
+pfsp-ii---firstImp--srz--exchange.txt,80.7129166666667,3.1526594334123
+pfsp-ii---firstImp--srz--insert.txt,215.41515,2.18465767930173
+pfsp-ii---firstImp--srz--transpose.txt,7.21641666666667,4.30615634393131

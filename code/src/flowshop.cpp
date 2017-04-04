@@ -271,9 +271,14 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
 
     for(int i = 1; i <= instance.getNbJob(); i++) {
 
+        // reset indicates if we should come back to the initial solution, if there is no improvement
         bool reset = true;
+
+        // the element is first inserted in the first position
         if(i > 1) {
             insert(sol, i, 1);
+
+            // the completion time matrix is entirely computed
             newCost = instance.computePartialWCT(sol, 1);
             if(bestImp) {
                 if(newCost < bestNewCost) {
@@ -291,15 +296,13 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
             }
         }
 
+        // then all other positions are tried with transpose moves
         for(int j = 2; j <= instance.getNbJob(); j++) {
 
             transpose(sol, j-1);
 
-            // newCost = instance.computePartialWCT(sol, min(i, j-1));
-            newCost = instance.computePartialWCT(sol, 1);
-
-            // cout << "newCost: " << newCost << endl;
-            // cout << "newCost2: " << instance.computePartialWCTN(sol, 1) << endl;
+            // the completion time matrix is modified only starting from the last change
+            newCost = instance.computePartialWCT(sol, min(i, j-1));
 
             if(bestImp) {
                 if((j == 2 && i == 1) || newCost < bestNewCost) {
@@ -312,7 +315,6 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
                     // first improvement, the move is applied directly
                     // cost = instance.computePartialWCT(sol, min(i, j-1));
                     cost = instance.computePartialWCT(sol, 1);
-
 
                     improve = true;
                     reset = false;
@@ -329,7 +331,6 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
         } else {
             // go back to the best position found
             insert(sol, instance.getNbJob(), bestPosB);
-            // displaySolution(sol);
         }
     }
 
@@ -339,6 +340,7 @@ bool insertImprovement(PfspInstance& instance, vector<int>& sol, long int& cost,
         cost = bestNewCost;
     }
 
+    // the completion time matrix has been modified
     cost = instance.computePartialWCT(sol, 1);
 
     return improve;
@@ -359,7 +361,6 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
       randomPermutation(instance.getNbJob(), sol);
       cost = instance.computePartialWCT(sol, 1);
   }
-  // displaySolution(sol);
 
   // step
   while(improvement) {
@@ -372,7 +373,6 @@ void iterativeImprovement(PfspInstance& instance, vector< int > & sol, long int&
         improvement = insertImprovement(instance, sol, cost, param.bestImp);
     }
 
-    cost = instance.computePartialWCT(sol, 1);
   }
 
 }
