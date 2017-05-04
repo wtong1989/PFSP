@@ -3,7 +3,7 @@
 
 #include "pfspinstance.h"
 
-struct strSort {
+typedef struct strSort {
     long int job;
     long int wSum;
 

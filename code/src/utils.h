@@ -3,7 +3,7 @@
 
 #include <vector>
 
-struct parameters {
+typedef struct parameters {
     bool bestImp;
     bool rz;
     int neighborhood;
