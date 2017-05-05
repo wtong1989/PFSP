@@ -25,7 +25,7 @@
 #include <ctime>
 
 #include "localsearch.h"
-
+#include "stochasticls.h"
 #include "construction.h"
 
 using namespace std;
@@ -33,9 +33,9 @@ using namespace std;
 /***********************************************************************/
 int main(int argc, char *argv[])
 {
+
   int i;
   long int totalWeightedTardiness;
-
 
   if (argc == 1)
   {
@@ -58,15 +58,11 @@ int main(int argc, char *argv[])
   if (! instance.readDataFromFile(argv[1]) )
     return 1;
 
-
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-  int cost = rzRandomizedHeuristic(instance, 1., solution);
+  grasp(instance, solution, totalWeightedTardiness, 0.4, 10000);
 
-  cout << "cost randomized: " << cost << endl;
-
-  cost = rzHeuristic(instance, solution);
-  cout << "cost pure rz: " << cost << endl;
+  cout << "best: " << totalWeightedTardiness << endl;
 
   return 0;
 }
