@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-  grasp(instance, solution, totalWeightedTardiness, 0.4, 10000);
+  grasp(instance, solution, totalWeightedTardiness, 0.25, 60000);
 
   cout << "best: " << totalWeightedTardiness << endl;
 
@@ -76,7 +76,7 @@ void test(int argc, char* argv[]) {
     if (argc == 1)
     {
       cout << "Usage: ./flowshopWCT <instance_file>" << endl;
-    //   return 0;
+      // return 0;
     }
 
     parameters param;

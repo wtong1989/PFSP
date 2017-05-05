@@ -3,7 +3,7 @@
 
 #include "pfspinstance.h"
 
-// graps metaheuristic
+// grasp metaheuristic
 void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double alpha, double timeLimit);
 
 #endif

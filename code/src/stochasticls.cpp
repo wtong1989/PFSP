@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+// grasp metaheuristic
 void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double alpha, double timeLimit) {
 
     // first improvement
@@ -24,14 +25,18 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
         // iterative improvement on this solution
         bool improve = true;
         while(improve) {
+
             improve = insertImprovement(instance, solution, cost, false);
+
         }
 
         // update best solution found so far
         if(cost < bestCost) {
             bestCost = cost;
             bestSol = solution;
+            cout << "improvement: " << bestCost << endl;
         }
+
 
         cur = clock();
         t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
