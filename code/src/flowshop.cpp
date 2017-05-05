@@ -26,6 +26,8 @@
 
 #include "localsearch.h"
 
+#include "construction.h"
+
 using namespace std;
 
 /***********************************************************************/
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
   }
 
   /* initialize random seed: */
-  srand ( 42 );
+  srand ( 12345 );
 
   /* Create instance object */
   PfspInstance instance;
@@ -56,30 +58,69 @@ int main(int argc, char *argv[])
   if (! instance.readDataFromFile(argv[1]) )
     return 1;
 
-  /* Create a vector of int to represent the solution
-    WARNING: By convention, we store the jobs starting from index 1,
-             thus the size nbJob + 1. */
+
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-  clock_t begin, end;
+  int cost = rzRandomizedHeuristic(instance, 1., solution);
 
-  begin = clock();
+  cout << "cost randomized: " << cost << endl;
 
-  // apply the chosen heuristic
-  if(param.vnd) {
-      VNDHeuristic(instance, solution, totalWeightedTardiness, param);
-  } else {
-      iterativeImprovement(instance, solution, totalWeightedTardiness, param);
-  }
-
-  end = clock();
-
-  cout << endl << "Best: " << totalWeightedTardiness << endl;
-
-  double t = (double)(end - begin) / CLOCKS_PER_SEC;
-  t *= 1000.;
-
-  cout << "Time: " << t << endl;
+  cost = rzHeuristic(instance, solution);
+  cout << "cost pure rz: " << cost << endl;
 
   return 0;
+}
+
+void test(int argc, char* argv[]) {
+
+    int i;
+    long int totalWeightedTardiness;
+
+
+    if (argc == 1)
+    {
+      cout << "Usage: ./flowshopWCT <instance_file>" << endl;
+    //   return 0;
+    }
+
+    parameters param;
+    if(argc > 2) {
+        extractParameters(argv, argc, param);
+    }
+
+    /* initialize random seed: */
+    srand ( 42 );
+
+    /* Create instance object */
+    PfspInstance instance;
+
+    /* Read data from file */
+    // if (! instance.readDataFromFile(argv[1]) )
+    //   return 1;
+
+    /* Create a vector of int to represent the solution
+      WARNING: By convention, we store the jobs starting from index 1,
+               thus the size nbJob + 1. */
+    vector< int > solution ( instance.getNbJob()+ 1 );
+
+    clock_t begin, end;
+
+    begin = clock();
+
+    // apply the chosen heuristic
+    if(param.vnd) {
+        VNDHeuristic(instance, solution, totalWeightedTardiness, param);
+    } else {
+        iterativeImprovement(instance, solution, totalWeightedTardiness, param);
+    }
+
+    end = clock();
+
+    cout << endl << "Best: " << totalWeightedTardiness << endl;
+
+    double t = (double)(end - begin) / CLOCKS_PER_SEC;
+    t *= 1000.;
+
+    cout << "Time: " << t << endl;
+
 }
