@@ -60,7 +60,9 @@ int main(int argc, char *argv[])
 
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-  grasp(instance, solution, totalWeightedTardiness, 0.25, 60000);
+  grasp(instance, solution, totalWeightedTardiness, 0.25, 5000);
+
+  // reactiveGrasp(instance, solution, totalWeightedTardiness, 5, 75, 20000);
 
   cout << "best: " << totalWeightedTardiness << endl;
 

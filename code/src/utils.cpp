@@ -18,6 +18,9 @@ int generateRndPosition(int min, int max)
   return ( rand() % max + min );
 }
 
+double rndNumber() {
+    return (double)rand() / (double)RAND_MAX;
+}
 
 // setup the param data structure with the command line parameters
 /*----------------------------------------------------------------------------*/

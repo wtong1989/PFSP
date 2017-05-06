@@ -18,6 +18,9 @@ void displaySolution(std::vector<int>& sol);
 /* generate a random position */
 int generateRndPosition(int min, int max);
 
+/* generate a random number between and one */
+double rndNumber();
+
 // setup the param data structure with the command line parameters
 /*----------------------------------------------------------------------------*/
 void extractParameters(char* cmd[], int nb, parameters& param);
