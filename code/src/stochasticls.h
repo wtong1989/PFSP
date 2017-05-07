@@ -10,7 +10,7 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
 int pickAlpha(const std::vector<double>& probas);
 
 // update the alpha's probabilities
-void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst, std::vector<int>& freqAlpha, std::vector<double>& averagesAlpha);
+void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst, std::vector<int>& freqAlpha, std::vector<double>& sumAlpha);
 
 // reactive grasp metaheuristic
 void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, int m, int Nalpha, double timeLimit);

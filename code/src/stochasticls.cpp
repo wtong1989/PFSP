@@ -65,12 +65,12 @@ int pickAlpha(const std::vector<double>& probas) {
 }
 
 // update the alpha's probabilities
-void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst, std::vector<int>& freqAlpha, std::vector<double>& averagesAlpha) {
+void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst, std::vector<int>& freqAlpha, std::vector<double>& sumAlpha) {
 
     double sum = 0.;
 
     for(int i = 0; i < probas.size(); i++) {
-        double avg = averagesAlpha.at(i)/(double)freqAlpha.at(i);
+        double avg = sumAlpha.at(i)/(double)freqAlpha.at(i);
         probas.at(i) = (avg - (double)zWorst)/((double)zBest - (double)zWorst);
         sum += probas.at(i);
     }
@@ -80,9 +80,6 @@ void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst
 
     zBest = -1;
     zWorst = -1;
-
-    fill(averagesAlpha.begin(), averagesAlpha.end(), 0.);
-    fill(freqAlpha.begin(), freqAlpha.end(), 0);
 
     for(int i = 0; i < probas.size(); i++) {
         cout << probas.at(i) << " ";
@@ -95,7 +92,7 @@ void updateProbas(std::vector<double>& probas, long int& zBest, long int& zWorst
 void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, int m, int Nalpha, double timeLimit) {
 
     vector<double> probas(m, 1./(double)m); // probabilities of picking each alpha
-    vector<double> averagesAlpha(m, 0); // average quality of a solution for a given alpha
+    vector<double> sumAlpha(m, 0); // average quality of a solution for a given alpha
     vector<int> freqAlpha(m, 0); // frequency of alphas
 
     clock_t begin = clock(), cur;
@@ -110,6 +107,8 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
     long int bestNalpha = -1, worstNAlpha = -1; // best and worst alpha for a reactive run (after each reactive run, probas are updated)
     int k; // chosen alpha
 
+    // TODO don't reset the averages after each reactive iteration
+
     do {
         // generate a greedy randomized initial solution
         k = pickAlpha(probas);
@@ -121,7 +120,7 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
             improve = insertImprovement(instance, solution, cost, false);
         }
 
-        // update best solution found so far
+        // update the best solution found so far
         if(cost < bestCost || bestCost < 0) {
             bestCost = cost;
             bestSol = solution;
@@ -135,14 +134,14 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
         if(cost > worstNAlpha || worstNAlpha < 0) {
             worstNAlpha = cost;
         }
-        averagesAlpha.at(k) += cost;
+        sumAlpha.at(k) += cost;
         freqAlpha.at(k) ++;
 
         it ++;
 
         // end of the reactive run, update probabilities
         if(it >= Nalpha) {
-            updateProbas(probas, bestNalpha, worstNAlpha, freqAlpha, averagesAlpha);
+            updateProbas(probas, bestNalpha, worstNAlpha, freqAlpha, sumAlpha);
             it = 0;
         }
 
@@ -156,5 +155,5 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
 // simulated annealing metaheuristic
 void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double T0, double alpha, int n, double timeLimit) {
 
-    
+
 }
