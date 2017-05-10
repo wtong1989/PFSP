@@ -22,6 +22,12 @@ bool exchangeImprovement(PfspInstance& instance, std::vector<int>& sol, long int
 /* insert improvement */
 bool insertImprovement(PfspInstance& instance, std::vector<int>& sol, long int& cost, bool bestImp);
 
+/* transpose improvement with Metropolis condition */
+bool transposeImprovementMetro(PfspInstance& instance, std::vector<int>& sol, long int& cost, double T);
+
+/* insert improvement with Metropolis condition */
+bool insertImprovementMetro(PfspInstance& instance, std::vector<int>& sol, long int& cost, double T);
+
 /* Improve the solution */
 void iterativeImprovement(PfspInstance& instance, std::vector< int > & sol, long int& cost, parameters& param);
 

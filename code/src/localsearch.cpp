@@ -1,5 +1,9 @@
 #include "localsearch.h"
 #include "construction.h"
+#include <cmath>
+#include <iostream>
+
+using namespace std;
 
 /* transpose move */
 void transpose(vector<int>& sol, int pos) {
@@ -43,7 +47,7 @@ bool transposeImprovement(PfspInstance& instance, vector<int>& sol, long int& co
     int bestPos = -1;
     bool improve = false;
 
-    for(int i = 1; i <= instance.getNbJob(); i++) {
+    for(int i = 1; i <= instance.getNbJob()-1; i++) {
 
         transpose(sol, i);
         newCost = instance.computePartialWCTN(sol, i);
@@ -279,5 +283,127 @@ void VNDHeuristic(PfspInstance& instance, vector< int > & sol, long int& cost, p
 
         // the algorithm stops when no improvement has been found in the last neighborhood
     } while(neighbourhood < 4);
+
+}
+
+/* transpose improvement with Metropolis condition */
+bool transposeImprovementMetro(PfspInstance& instance, std::vector<int>& sol, long int& cost, double T) {
+
+    long newCost;
+    bool improve = false;
+
+    for(int i = 1; i <= instance.getNbJob()-1; i++) {
+
+        transpose(sol, i);
+        newCost = instance.computePartialWCTN(sol, i);
+
+        bool accept = false;
+        if(newCost < cost) {
+            accept = true;
+        } else {
+            double delta = cost-newCost;
+            accept = (rndNumber() <= exp(delta/T));
+        }
+
+        if(accept) {
+            // first improvement, the move is applied directly
+            cost = instance.computePartialWCT(sol, i);
+            // long int cost2 = instance.computePartialWCT(sol, 1);
+            // cout << cost << " vs " << cost2 << endl;
+            // cout << " i: " << i << endl;
+            // cost = cost2;
+            improve = true;
+        } else {
+            transpose(sol, i); // no improvement, the move is canceled
+        }
+
+    }
+
+    return improve;
+
+}
+
+/* insert improvement with Metropolis condition*/
+bool insertImprovementMetro(PfspInstance& instance, std::vector<int>& sol, long int& cost, double T) {
+
+    long int bestNewCost, newCost;
+    int bestPos = -1;
+    bool improve = false;
+
+    for(int i = 1; i <= instance.getNbJob(); i++) {
+
+        // reset indicates if we should come back to the initial solution, if there is no improvement
+        bool reset = true;
+
+        // the element is first inserted in the first position
+        if(i > 1) {
+            insert(sol, i, 1);
+
+            // the completion time matrix is entirely computed
+            newCost = instance.computePartialWCT(sol, 1);
+
+            // compute the metropolis condition
+            bool accept = false;
+            if(newCost < cost) {
+                accept = true;
+            } else {
+                double delta = cost-newCost;
+                accept = (rndNumber() <= exp(delta/T));
+            }
+
+            // improvement applied directly
+            if(accept) {
+                improve = true;
+                reset = false;
+                bestPos = 1;
+                cost = newCost;
+            }
+
+        }
+
+        // then all other positions are tried with transpose moves
+        for(int j = 2; j <= instance.getNbJob(); j++) {
+
+            transpose(sol, j-1);
+
+            // the completion time matrix is modified only starting from the last change
+            newCost = instance.computePartialWCT(sol, min(i, j-1));
+
+            // compute the metropolis condition
+            bool accept = false;
+            if(newCost < cost) {
+                accept = true;
+            } else {
+                double delta = cost-newCost;
+                accept = (rndNumber() <= exp(delta/T));
+            }
+
+            if(accept) {
+                // first improvement, the move is applied directly
+                cost = instance.computePartialWCT(sol, 1);
+
+                improve = true;
+                reset = false;
+                bestPos = j;
+            }
+
+        }
+
+        if(reset) {
+            if(i < instance.getNbJob()) {
+                // cancel the move, reset the element to the initial position
+                insert(sol, instance.getNbJob(), i);
+            }
+        } else {
+            // go back to the best position found
+            insert(sol, instance.getNbJob(), bestPos);
+        }
+    }
+
+
+    // the completion time matrix has been modified
+    cost = instance.computePartialWCT(sol, 1);
+
+    return improve;
 
 }

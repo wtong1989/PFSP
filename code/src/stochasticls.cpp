@@ -98,10 +98,10 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
     clock_t begin = clock(), cur;
     double t;
 
-    // initial solution
+    // uninitialised solution
     bestCost = -1;
 
-    std::vector<int> solution(instance.getNbJob()+1);
+    vector<int> solution(instance.getNbJob()+1);
 
     int it = 0; // current number of iteration during one reactive run
     long int bestNalpha = -1, worstNAlpha = -1; // best and worst alpha for a reactive run (after each reactive run, probas are updated)
@@ -154,6 +154,54 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
 
 // simulated annealing metaheuristic
 void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double T0, double alpha, int n, double timeLimit) {
+
+    // initial solution
+    bestCost = rzHeuristic(instance, bestSol);
+
+    vector<int> sol = bestSol;
+    long int cost = bestCost;
+
+    cout << "initial cost: " << cost << endl;
+
+    // time measure
+    clock_t begin = clock(), cur;
+    double t;
+
+    // temperature
+    double T = T0;
+
+    // number of iteration
+    int it = 0;
+
+    int it2 = 0;
+
+    do {
+
+        // perform local search
+        insertImprovementMetro(instance, sol, cost, T);
+        // transposeImprovementMetro(instance, sol, cost, T);
+
+        // update best solution if necessary
+        if(cost < bestCost) {
+            bestCost = cost;
+            bestSol = sol;
+            cout << "improvement: " << bestCost << endl;
+            cout << "temp: " << T << endl;
+        }
+
+        // update temperature
+        it ++;
+        if(it >= n) {
+            it = 0;
+            T = T*alpha;
+        }
+
+        it2 ++;
+
+        cur = clock();
+        t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
+
+    } while(t < timeLimit);
 
 
 }
