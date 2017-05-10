@@ -174,17 +174,19 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
     int it = 0;
 
     int it2 = 0;
+    bool improve = false;
 
     do {
 
         // perform local search
-        insertImprovementMetro(instance, sol, cost, T);
-        // transposeImprovementMetro(instance, sol, cost, T);
+        // insertImprovementMetro(instance, sol, cost, T);
+        transposeImprovementMetro(instance, sol, cost, T);
 
         // update best solution if necessary
         if(cost < bestCost) {
             bestCost = cost;
             bestSol = sol;
+            improve = true;
             cout << "improvement: " << bestCost << endl;
             cout << "temp: " << T << endl;
         }
@@ -194,6 +196,17 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
         if(it >= n) {
             it = 0;
             T = T*alpha;
+
+            if(!improve) {
+                if(T <= 100) {
+                    cout << "lastTem: " << T << endl;
+                    T = T0;
+                    // T0 = T0*0.95;
+                    cout << "warming up: " << cost << endl;
+                }
+            } else {
+                improve = false;
+            }
         }
 
         it2 ++;
