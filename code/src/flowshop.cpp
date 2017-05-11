@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
   cout << "best: " << totalWeightedTardiness << endl;
 
   cout << "recompute: " << instance.computeWCT(solution) << endl;
+  displaySolution(solution);
 
   return 0;
 }
