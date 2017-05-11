@@ -63,13 +63,12 @@ int main(int argc, char *argv[])
   grasp(instance, solution, totalWeightedTardiness, 0.4, 30000);
   // simulatedAnnealing(instance, solution, totalWeightedTardiness, 1000, 0.998, 100, 30000);
 
-
-
   // reactiveGrasp(instance, solution, totalWeightedTardiness, 10, 75, 10000);
   // simulatedAnnealing(instance, solution, totalWeightedTardiness, 700, 0.80, 100, 30000);
 
-
   cout << "best: " << totalWeightedTardiness << endl;
+
+  cout << "recompute: " << instance.computeWCT(solution) << endl;
 
   return 0;
 }

@@ -18,4 +18,7 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
 // simulated annealing metaheuristic
 void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double T0, double alpha, int n, double timeLimit);
 
+// perturbative step on a solution: perform n random insert moves
+void permurbativeStep(PfspInstance& instance, std::vector<int>& sol, long int& cost, int n);
+
 #endif

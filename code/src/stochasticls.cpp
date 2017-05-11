@@ -3,6 +3,9 @@
 #include "localsearch.h"
 
 #include <iostream>
+#include <list>
+
+using namespace std;
 
 // grasp metaheuristic
 void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost, double alpha, double timeLimit) {
@@ -17,7 +20,16 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
 
     std::vector<int> solution(instance.getNbJob()+1);
 
+    std::vector<int> solution2(instance.getNbJob()+1);
+    long int cost2;
+
+    int nbGr = 0;
+    int nbStepTwo = 0;
+    bool stepTwo;
+
     do {
+
+        nbGr ++;
 
         // generate a greedy randomized initial solution
         long int cost = rzRandomizedHeuristic(instance, alpha, solution);
@@ -25,23 +37,57 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
         // iterative improvement on this solution
         bool improve = true;
         while(improve) {
-
             improve = insertImprovement(instance, solution, cost, false);
-
         }
 
+        stepTwo = false;
         // update best solution found so far
         if(cost < bestCost || bestCost < 0) {
             bestCost = cost;
             bestSol = solution;
             cout << "improvement: " << bestCost << endl;
+            stepTwo = true;
+        } else {
+            double proxi = (double)(cost-bestCost)/(double)cost;
+
+            // cout << "proximity: " << proxi << endl;
+
+            if(proxi <= 0.02) {
+                stepTwo = true;
+            }
         }
 
+        // perform a perturbative local search
+        if(stepTwo) {
+            nbStepTwo ++;
+            for(int i = 0; i < 18; i++) {
+
+                solution2 = solution;
+                permurbativeStep(instance, solution2, cost2, 5);
+
+                // iterative improvement on this solution
+                bool improve = true;
+                while(improve) {
+                    improve = insertImprovement(instance, solution2, cost2, false);
+                }
+
+                // update best solution found so far
+                if(cost2 < bestCost) {
+                    bestCost = cost2;
+                    bestSol = solution2;
+                    cout << "improvement bis: " << bestCost << endl;
+                }
+
+            }
+
+        }
 
         cur = clock();
         t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
 
     } while(t < timeLimit);
+
+    cout << "nb run grasp: " << nbGr << " ; nb step two: " << nbStepTwo << endl;
 
 }
 
@@ -216,5 +262,17 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
 
     } while(t < timeLimit);
 
+
+}
+
+// perturbative step on a solution: perform n random insert moves
+void permurbativeStep(PfspInstance& instance, std::vector<int>& sol, long int& cost, int n) {
+
+    for(int i = 0; i < n; i++) {
+        int elt = generateRndPosition(1, instance.getNbJob());
+        int pos = generateRndPosition(1, instance.getNbJob());
+        insert(sol, elt, pos);
+    }
+    cost = instance.computePartialWCT(sol, 1, instance.getNbJob());
 
 }

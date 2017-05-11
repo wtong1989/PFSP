@@ -32,4 +32,11 @@ Insert is the best neighborhood, however, it is longer.
 mean instances 50: 60.17067, x500: 30085.33\newline
 mean instances 100: 563.8932, x500: 281946.6
 
+\subsection{GRASP}
+
+If the solution improve the best known, or if it is close enough, some perturbative steps are applied to the local search.
+This step is called step two and the proximity to the best solution has been tuned in function of the number of time this step is executed.
+The perturbative steps consist in applying random insert moves.
+The number of moves is a parameter and tests have shown that this number should be quite low (about 5 changes for 50 jobs).
+
 \end{document}
