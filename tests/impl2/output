@@ -1,0 +1,14 @@
+Parameters: 
+	instance: ../../instances/100_20_02
+	seed: 1112
+	algorithme: grasp
+	time limit: 2
+name : 100_20_02
+file : ../../instances/100_20_02
+File ../../instances/100_20_02 is now open, start to read...
+Number of jobs : 100
+Number of machines : 20
+Allow memory for the matrix...
+Memory allowed.
+Start to read matrix...
+All is read from file.

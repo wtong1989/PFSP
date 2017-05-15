@@ -23,13 +23,13 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
     std::vector<int> solution2(instance.getNbJob()+1);
     long int cost2;
 
-    int nbGr = 0;
-    int nbStepTwo = 0;
+    // int nbGr = 0;
+    // int nbStepTwo = 0;
     bool stepTwo;
 
     do {
 
-        nbGr ++;
+        // nbGr ++;
 
         // generate a greedy randomized initial solution
         long int cost = rzRandomizedHeuristic(instance, alpha, solution);
@@ -45,7 +45,7 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
         if(cost < bestCost || bestCost < 0) {
             bestCost = cost;
             bestSol = solution;
-            cout << "improvement: " << bestCost << endl;
+            // cout << "improvement: " << bestCost << endl;
             stepTwo = true;
         } else {
             double proxi = (double)(cost-bestCost)/(double)cost;
@@ -59,7 +59,7 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
 
         // perform a perturbative local search
         if(stepTwo) {
-            nbStepTwo ++;
+            // nbStepTwo ++;
             for(int i = 0; i < 18; i++) {
 
                 solution2 = solution;
@@ -75,7 +75,7 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
                 if(cost2 < bestCost) {
                     bestCost = cost2;
                     bestSol = solution2;
-                    cout << "improvement bis: " << bestCost << endl;
+                    // cout << "improvement bis: " << bestCost << endl;
                 }
 
             }
@@ -87,7 +87,7 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
 
     } while(t < timeLimit);
 
-    cout << "nb run grasp: " << nbGr << " ; nb step two: " << nbStepTwo << endl;
+    // cout << "nb run grasp: " << nbGr << " ; nb step two: " << nbStepTwo << endl;
 
 }
 
@@ -233,8 +233,8 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
             bestCost = cost;
             bestSol = sol;
             improve = true;
-            cout << "improvement: " << bestCost << endl;
-            cout << "temp: " << T << endl;
+            // cout << "improvement: " << bestCost << endl;
+            // cout << "temp: " << T << endl;
         }
 
         // update temperature
@@ -245,10 +245,10 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
 
             if(!improve) {
                 if(T <= 100) {
-                    cout << "lastTem: " << T << endl;
+                    // cout << "lastTem: " << T << endl;
                     T = T0;
                     // T0 = T0*0.95;
-                    cout << "warming up: " << cost << endl;
+                    // cout << "warming up: " << cost << endl;
                 }
             } else {
                 improve = false;

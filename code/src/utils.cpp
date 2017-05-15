@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
 
 using namespace std;
 
@@ -100,4 +101,46 @@ void extractParameters(char* cmd[], int nb, parameters& param) {
 
     cout << endl << endl;
 
+}
+
+/* setup the param data structure with the command line parameters (implementation exercise 2)*/
+void extractParameters2(char* cmd[], int nb, parameters2& param) {
+
+    param.algo = false;
+    param.instanceName = -1;
+    param.seed = 42;
+    param.timeLimit = 42;
+
+    int i = 1;
+
+    while(i < nb) {
+
+        if(string(cmd[i]) == "--instance") {
+            i ++;
+            param.instanceName = i;
+        } else if(string(cmd[i]) == "--algo") {
+            i ++;
+            if(string(cmd[i]) == "sa") {
+                param.algo = false;
+            } else if(string(cmd[i]) == "grasp") {
+                param.algo = true;
+            }
+        } else if(string(cmd[i]) == "--seed") {
+            i ++;
+            istringstream seedStream(cmd[i]);
+            seedStream >> param.seed;
+        } else if(string(cmd[i]) == "--time") {
+            i ++;
+            istringstream timeStream(cmd[i]);
+            timeStream >> param.timeLimit;
+        }
+
+        i ++;
+    }
+
+    cout << "Parameters: " << endl;
+    cout << "\tinstance: " << cmd[param.instanceName] << endl;
+    cout << "\tseed: " << param.seed << endl;
+    cout << "\talgorithme: " << (param.algo ? "grasp" : "simulated annealing") << endl;
+    cout << "\ttime limit: " << param.timeLimit << endl;
 }

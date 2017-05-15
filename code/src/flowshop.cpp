@@ -37,39 +37,35 @@ int main(int argc, char *argv[])
   int i;
   long int totalWeightedTardiness;
 
-  if (argc == 1)
-  {
-    cout << "Usage: ./flowshopWCT <instance_file>" << endl;
-    return 0;
-  }
-
-  parameters param;
-  if(argc > 2) {
-      extractParameters(argv, argc, param);
+  parameters2 param;
+  if(argc > 0) {
+      extractParameters2(argv, argc, param);
   }
 
   /* initialize random seed: */
-  srand ( 12345 );
+  // srand ( 12345 );
+  srand(param.seed);
 
   /* Create instance object */
   PfspInstance instance;
 
   /* Read data from file */
-  if (! instance.readDataFromFile(argv[1]) )
+  if (! instance.readDataFromFile(argv[param.instanceName]) )
     return 1;
 
   vector< int > solution ( instance.getNbJob()+ 1 );
 
-  grasp(instance, solution, totalWeightedTardiness, 0.4, 30000);
-  // simulatedAnnealing(instance, solution, totalWeightedTardiness, 1000, 0.998, 100, 30000);
+  if(param.algo) {
+    //   grasp(instance, solution, totalWeightedTardiness, 0.4, 30000);
+    grasp(instance, solution, totalWeightedTardiness, 0.4, param.timeLimit);
+  } else {
+    // simulatedAnnealing(instance, solution, totalWeightedTardiness, 1000, 0.998, 100, 30000);
+    simulatedAnnealing(instance, solution, totalWeightedTardiness, 1000, 0.998, 100, param.timeLimit);
+  }
 
-  // reactiveGrasp(instance, solution, totalWeightedTardiness, 10, 75, 10000);
-  // simulatedAnnealing(instance, solution, totalWeightedTardiness, 700, 0.80, 100, 30000);
+  cout << "Best: " << totalWeightedTardiness << endl;
 
-  cout << "best: " << totalWeightedTardiness << endl;
-
-  cout << "recompute: " << instance.computeWCT(solution) << endl;
-  displaySolution(solution);
+  cout << endl << endl << endl;
 
   return 0;
 }
