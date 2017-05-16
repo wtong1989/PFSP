@@ -2,13 +2,15 @@
 
 function save {
 
-    str=$(cat output_rtsa)
+    str=$(cat $3)
     echo "$str"
+    echo ""
+    echo ""
 
     rt=$(printf "$str" | grep -o -E 'imp:.*' | cut -d ':' -f2 | tr " " "\n")
 
-    echo "res grep"
-    echo "$rt"
+    # echo "res grep"
+    # echo "$rt"
 
     printf "$rt\n" >> $2
 
@@ -21,6 +23,11 @@ function run {
 
     # echo "$a"
 
+    nameTemp="output_rtsa_$a"
+
+    # echo "temp name:"
+    # echo $nameTemp
+
     if [ "$a" != "bestSolutions.txt" ]; then
 
         # size of the instance
@@ -28,25 +35,26 @@ function run {
         # echo "size: $size"
 
         timeLimit=300850
+        # timeLimit=5000
 
-        timeLimit=3000
+        # timeLimit=3000
         # echo "time limit: $timeLimit"
 
         for s in ${seed[@]}
         do
             name="rtsa/rtsa_$a"
             # echo "name: $name"
-            ./../../code/flowshopWCT "--instance" $1 "--algo" "sa" "--seed" $s "--time" $timeLimit > output_rtsa
-            save $a $name
+            ./../../code/flowshopWCT "--instance" $1 "--algo" "sa" "--seed" $s "--time" $timeLimit > $nameTemp
+            save $a $name $nameTemp
         done
 
     fi
+
+    rm $nameTemp
 }
 
-# declare -a seed=("12345" "67891" "01112" "13141" "51617" "18192" "02122" "23242" "52627" "28293" "03132" "33343" "53637" "38394" "04142" "43444" "54647" "48495" "51525" "35455" "56575" "85960" "61626" "36465" "66676")
+declare -a seed=("12345" "67891" "01112" "13141" "51617" "18192" "02122" "23242" "52627" "28293" "03132" "33343" "53637" "38394" "04142" "43444" "54647" "48495" "51525" "35455" "56575" "85960" "61626" "36465" "66676")
 
-declare -a seed=("12345" "6789")
+# declare -a seed=("12345" "6789")
 
 run $1
-
-rm output_rtsa
