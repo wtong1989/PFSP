@@ -24,34 +24,87 @@
 
 Two stochastic local search algorithms are implemented for this second implementation exercise.
 The first one is a simulated annealing, which belong to the class of simple stochastic algorithms.
-The second one is a Greedy Randomised Adaptive Search Procedure (GRASP), which is a hybrid stochastic algorithm.
+The second one is a Greedy Randomised Adaptive Search Procedures (GRASP), which is a hybrid stochastic algorithm.
 
-\section{metaheuristic design}
+\section{Metaheuristics used}
 
 \subsection{Simulated annealing}
 
+\subsubsection{Principle}
+
+The first metaheuristic implemented is the simulated annealing algorithm.
+This algorithm is made on the basis of a local search.
+The neighbourhood used is the transpose one because it is the smallest one.
+Thanks to this small neighbourhood, it is faster to explore most of the neighbours.
+The acceptance criterion of this method is based on the metropolis condition.
+If the new solution found improve the best found so far, it replaces it. Otherwise, there is a probability to accept a new solution, which is equal to $e^{ \frac{sol_{best}-sol_{actual}}{T}}$.
+$sol_{best}$ is the best solution found by the algorithm so far and $sol_{current}$ is the current solution.
+$T$ is a variable called temperature and it depends on three paramaters: the initial temperature ($T_0$), the length of a plateau ($N$) and the cooling rate ($\alpha$).
+At the begining of the algorithm, $T$ is equal to $T_0$ and after each $N$ iterations, $T$ is updated as following: $T \leftarrow T*\alpha$.
+
+\subsubsection{Parameter tuning}
+
+As the acceptance criterion depends on the probability $e^{ \frac{sol_{best}-sol_{actual}}{T}}$, a new solution has more chance to be accepted if it is close to the best found so far and if the temperature is not too low. \newline
+
+It has been found that the initial temperature shouls be quite high.
+Otherwise, very few solutions were accepted.
+As seen in class, the parameter $N$ should be proporitonal to the number of neighbours.
+It has been set to twice the size of the neighbourhood ($\sim100$ for the instances of size 50, $\sim200$ for the instances of size 100).\newline
+
+Several values have been tested for the $\alpha$ parameter.
+It has been noticed that the cooling rate should be slow.
+Otherwise, the temperature become low too fast and no more solutions are accepted.
+The final value used is $0.998$.
+
+\subsubsection{Addition component}
+
+It has been noticed that even with a slow cooling rate, the temperature decreases very fast and the algorithm does not accept new solutions long before the end of the algorithm.
+In addition, as the algorithm is stochastic, it follows different paths each at execution (with a different seed) and good solutions can be missed.
+To improve the result, when the temperature is too low, it is set to the original temperature again.
+The limit temperature, which is equal to $100$, has been decided by testing the number of solutions accepted.
+
 \subsection{GRASP}
 
-According to the report, best improvement doesn't improve, so first improvement is chosen.
-Insert is the best neighborhood, however, it is longer.\newline
+\subsubsection{Principle}
 
-If the solution improve the best known, or if it is close enough, some perturbative steps are applied to the local search.
+Greedy Randomised Adaptive Search Procedures (GRASP) is a metaheuristic based on a constructive step and a local search step.
+The algorithm build a new solution and applies a local search to it.
+This step is repeated until the termination criterion is met.\newline
+
+The local search step is done using the algorithms from the first implementation exercise.
+According to the first report, best improvement doesn't improve, so first improvement is chosen.
+The insert neighbourhood is also used because it was the best one.\newline
+
+The constructive step is based on the simplified rz heuristic.
+The construction depends on a parameter $\alpha$ which represents the amount of randomness of the solution.
+The first step of the algorithm remains the same: the jobs are ordered according to the weighted sum of the processing times.
+After this step, the insertion position of the jobs is uniformly chosen amoung the positions whose cost is lower or equal than $\alpha*cost_{worst} + (1-\alpha)*cost_{best}$, where $cost_{best}$ is the cost of the partial solution using the best insertion position and $cost_{worst}$ is the cost using the worst position.
+If $\alpha$ is equal to $0$, the solution is equal to the heuristic solution (if no ties) and if $\alpha$ is equal to $1$, the solution is almost random.
+
+\subsubsection{Parameter tuning}
+
+There is only one paramter for this algorithm.
+However, the tuning is complicated since the optimal $\alpha$ is not the same on for instances.
+It has been observed that a low value is better.
+The final value used in the algorithm is $0.4$. 
+
+\subsubsection{Addition component}
+
+If the solution improves the best known, or if it is close enough, some perturbative steps are applied to the local search.
 This step is called step two and the proximity to the best solution has been tuned in function of the number of time this step is executed.
 The perturbative steps consist in applying random insert moves.
 The number of moves is a parameter and tests have shown that this number should be quite low (about 5 changes for 50 jobs).
 
-\subsection{stoping critera}
+\subsection{Stoping critera}
 
 mean instances 50: 60.17067, x500: 30085.33\newline
 mean instances 100: 563.8932, x500: 281946.6
-
-\subsection{GRASP}
 
 
 
 \section{better solution found}
 
-50_20_03 \newline
+50\_20\_03 \newline
 1 28 24 14 48 15 34 45 19 5 18 37 11 29 31 9 39 10 25 33 30 44 2 43 7 41 20 40 49 47 38 4 42 17 16 22 6 26 8 50 13 21 32 23 46 36 35 3 12 27 \newline
 591806
 
