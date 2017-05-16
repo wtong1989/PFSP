@@ -20,12 +20,25 @@
 
 \maketitle
 
+\section{Introduction}
+
+Two stochastic local search algorithms are implemented for this second implementation exercise.
+The first one is a simulated annealing, which belong to the class of simple stochastic algorithms.
+The second one is a Greedy Randomised Adaptive Search Procedure (GRASP), which is a hybrid stochastic algorithm.
+
 \section{metaheuristic design}
 
-\subsection{choices of iterative improvement}
+\subsection{Simulated annealing}
+
+\subsection{GRASP}
 
 According to the report, best improvement doesn't improve, so first improvement is chosen.
-Insert is the best neighborhood, however, it is longer.
+Insert is the best neighborhood, however, it is longer.\newline
+
+If the solution improve the best known, or if it is close enough, some perturbative steps are applied to the local search.
+This step is called step two and the proximity to the best solution has been tuned in function of the number of time this step is executed.
+The perturbative steps consist in applying random insert moves.
+The number of moves is a parameter and tests have shown that this number should be quite low (about 5 changes for 50 jobs).
 
 \subsection{stoping critera}
 
@@ -34,12 +47,9 @@ mean instances 100: 563.8932, x500: 281946.6
 
 \subsection{GRASP}
 
-If the solution improve the best known, or if it is close enough, some perturbative steps are applied to the local search.
-This step is called step two and the proximity to the best solution has been tuned in function of the number of time this step is executed.
-The perturbative steps consist in applying random insert moves.
-The number of moves is a parameter and tests have shown that this number should be quite low (about 5 changes for 50 jobs).
 
-\subsection{better solution found}
+
+\section{better solution found}
 
 50_20_03 \newline
 1 28 24 14 48 15 34 45 19 5 18 37 11 29 31 9 39 10 25 33 30 44 2 43 7 41 20 40 49 47 38 4 42 17 16 22 6 26 8 50 13 21 32 23 46 36 35 3 12 27 \newline

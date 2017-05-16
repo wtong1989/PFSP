@@ -1,8 +1,8 @@
 Parameters: 
 	instance: ../../instances/100_20_02
-	seed: 1112
-	algorithme: grasp
-	time limit: 2
+	seed: 13141
+	algorithme: simulated annealing
+	time limit: 281946
 name : 100_20_02
 file : ../../instances/100_20_02
 File ../../instances/100_20_02 is now open, start to read...
@@ -12,3 +12,4 @@ Allow memory for the matrix...
 Memory allowed.
 Start to read matrix...
 All is read from file.
+initial cost: 1890211
