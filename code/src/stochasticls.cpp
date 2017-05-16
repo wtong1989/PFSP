@@ -45,7 +45,9 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
         if(cost < bestCost || bestCost < 0) {
             bestCost = cost;
             bestSol = solution;
-            // cout << "improvement: " << bestCost << endl;
+            cur = clock();
+            t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
+            cout << "imp:" << t << ";" << bestCost << endl;
             stepTwo = true;
         } else {
             double proxi = (double)(cost-bestCost)/(double)cost;
@@ -76,6 +78,9 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
                     bestCost = cost2;
                     bestSol = solution2;
                     // cout << "improvement bis: " << bestCost << endl;
+                    cur = clock();
+                    t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
+                    cout << "imp:" << t << ";" << bestCost << endl;
                 }
 
             }
@@ -207,11 +212,15 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
     vector<int> sol = bestSol;
     long int cost = bestCost;
 
-    cout << "initial cost: " << cost << endl;
-
     // time measure
     clock_t begin = clock(), cur;
     double t;
+
+    // cout << "initial cost: " << cost << endl;
+
+    cur = clock();
+    t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
+    cout << "imp:" << t << ";" << bestCost << endl;
 
     // temperature
     double T = T0;
@@ -233,6 +242,9 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
             bestCost = cost;
             bestSol = sol;
             improve = true;
+            cur = clock();
+            t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
+            cout << "imp:" << t << ";" << bestCost << endl;
             // cout << "improvement: " << bestCost << endl;
             // cout << "temp: " << T << endl;
         }

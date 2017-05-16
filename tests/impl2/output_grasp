@@ -1,0 +1,27 @@
+Parameters: 
+	instance: ../../instances/50_20_01
+	seed: 12345
+	algorithme: simulated annealing
+	time limit: 3000
+name : 50_20_01
+file : ../../instances/50_20_01
+File ../../instances/50_20_01 is now open, start to read...
+Number of jobs : 50
+Number of machines : 20
+Allow memory for the matrix...
+Memory allowed.
+Start to read matrix...
+All is read from file.
+initial cost: 614083
+imp:133.133;612997
+imp:968.601;612980
+imp:975.517;612412
+imp:976.066;611635
+imp:976.443;611409
+imp:976.625;611083
+imp:2881.46;610697
+imp:2923.67;609482
+Best: 609482
+
+
+

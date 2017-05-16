@@ -2,7 +2,7 @@
 
 function save {
 
-    str=$(cat output_grasp)
+    str=$(cat output)
     printf "$str\n"
 
     best=$(printf "$str" | grep -o -E 'Best: [-+0-9.e]+' | cut -d ' ' -f2 )
@@ -34,22 +34,24 @@ function run {
             fi
 
             # timeLimit=2
+
             # echo "time limit: $timeLimit"
 
             for s in ${seed[@]}
             do
-                name="grasp/grasp_seed_$s"
+                name="sa/sa_seed_$s"
                 # echo "name: $name"
-                ./../../code/flowshopWCT "--instance" $f "--algo" "grasp" "--seed" $s "--time" $timeLimit > output_grasp
+                ./../../code/flowshopWCT "--instance" $f "--algo" "sa" "--seed" $s "--time" $timeLimit > output
                 save $a $name
             done
 
         fi
     done
+
 }
 
 declare -a seed=("12345" "67891" "01112" "13141" "51617")
 
 run
 
-rm output_grasp
+rm output
