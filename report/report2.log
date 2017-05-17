@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.11.19)  17 MAY 2017 23:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.11.19)  17 MAY 2017 23:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -781,8 +781,15 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 245.
 (./report2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 245.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 245.
-Package rerunfilecheck Info: File `report2.out' has not changed.
-(rerunfilecheck)             Checksum: 124B0EAE972D6BE878473B17185A8D24;1233.
+
+
+Package rerunfilecheck Warning: File `report2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `report2.out':
+(rerunfilecheck)             Before: 124B0EAE972D6BE878473B17185A8D24;1233
+(rerunfilecheck)             After:  3812FE74F6CD59A2D8B9E346EFD6CA05;1234.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 245.
  ) 
 Here is how much of TeX's memory you used:
@@ -792,7 +799,7 @@ Here is how much of TeX's memory you used:
  10764 multiletter control sequences out of 15000+600000
  16047 words of font info for 48 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 29i,6n,30p,335b,439s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 29i,6n,30p,338b,439s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/samuel/.texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1000.600pk> </home/
 samuel/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </home/samuel/.te
 xmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/samuel/.texmf-var/fo
@@ -808,9 +815,9 @@ f-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmsy7.pfb>
-Output written on report2.pdf (6 pages, 274470 bytes).
+Output written on report2.pdf (6 pages, 274745 bytes).
 PDF statistics:
- 387 PDF objects out of 1000 (max. 8388607)
+ 388 PDF objects out of 1000 (max. 8388607)
  170 compressed objects within 2 object streams
  31 named destinations out of 1000 (max. 500000)
  165 words of extra memory for PDF output out of 10000 (max. 10000000)
