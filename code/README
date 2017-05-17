@@ -1,0 +1,18 @@
+To compile the program, please go to the folder "code" and use the command "make".
+The executable file is called flowshopWCT.
+Several arguments can be provided to run the program.
+
+The arguments are:
+--instance #path_of_the_instance
+--algo #{sa or grasp}
+--time #time_limit_in_milliseconds
+--seed #seed_for_random_generator
+
+Organisation of the code:
+
+- The implementation of the metaheuristic are in the file "stochasticls.cpp"
+- These algorithms are based on the construction methods implemented in "construction.cpp" and on the iterative improvement methods implemented in "localsearch.cpp"
+- The command line arguments are extracted in the function in "utils.cpp"
+
+The seed used for the the random generator for the tests are:
+12345, 67891, 01112, 13141, 51617

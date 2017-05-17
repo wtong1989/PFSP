@@ -12,6 +12,8 @@
 
 \usepackage{hyperref}
 
+\usepackage{graphicx}
+
 \title{Heuristic Optimization: implementation exercise 2}
 \author{Samuel Buchet: 000447808}
 \date{May 2017}
@@ -23,7 +25,7 @@
 \section{Introduction}
 
 Two stochastic local search algorithms are implemented for this second implementation exercise.
-The first one is a simulated annealing, which belong to the class of simple stochastic algorithms.
+The first one is a simulated annealing, which belongs to the class of simple stochastic algorithms.
 The second one is a Greedy Randomised Adaptive Search Procedures (GRASP), which is a hybrid stochastic algorithm.
 
 \section{Metaheuristics}
@@ -109,18 +111,127 @@ Indeed, tests have shown that the best solutions are obtained with about $5$ ins
 
 \subsection{Stoping critera}
 
-mean instances 50: 60.17067, x500: 30085.33\newline
-mean instances 100: 563.8932, x500: 281946.6
+The stopping critera used for the two metaheuristics are computed from results of the first implementation exercise.
+The time allowed to both algorithms is equal to the mean time of the iterative improvement algorithms on instances of each size multiplied by $500$.\newline
+
+The mean time on the instances of size $50$ is $60.17067$ and the mean time on instances of size $100$ is 281946.6.
+The resulting time limits are $30085.33$ (size $50$) and $281946.6$ (size $100$).
+
 
 \section{Computational results}
 
+\subsection{Solution qualities comparison}
+
+Each instance has been solved 5 times by each algorithm and the mean of the relative percentage deviation has been taken.
+A different seed has been used for each run.
+
+\subsubsection{Means and standard deviations}
+
+The table below contains the means and standard deviations (sd) of the relative percentage deviations (rpd) from the best known solution for all instances of the same size.\newline
+
+\begin{tabular} {|c|c|c|c|c|}
+    \hline
+    Algorithm & rpd mean (50) & rpd sd (50) & rpd mean (100) & rpd sd (100) \\
+    \hline
+    Simulated annealing & 0.872 & 0.362 & 1.660 & 0.536 \\
+    \hline
+    GRASP & 0.329 & 0.136 & 1.005 & 0.235 \\
+    \hline
+\end{tabular}
+
+We can see that GRASP seems to be better than simulated annealing in terms of solution quality.
+The result of this algorithm also seems to bee more stable according to the standard deviation.
+We can also observe that for both algorithms, the quality is better on instances of size 50 and the results are less variable.
+
+\subsubsection{Statistical test}
+
+A Wilcoxon test can be executed on the relative percentage deviations on all instances of same size to confirm that there is a difference between the solution qualities reach by the algorithms.
+The test performed with a significance level equal to $0.05$ returns p-values equal to $2.419448*10^{-9}$ and $1.537326*10^{-11}$.
+This result shows that there is a statistical difference between the solution qualities of the two algorithms (the null hypothesis is rejected).
+Then according to the means, we can conclude that the implementation of GRASP is statistically better than the one of simulated annealing.
+
+\subsubsection{Correlation between the arpd's}
+
+\begin{figure}
+    \centering
+        \includegraphics[scale=0.5]{images/correlation}
+    \caption{Correlation plot between the arpd's}
+    \label{fig:corr}
+\end{figure}
+
+The figure \ref{fig:corr} shows the correlation between the average relative percentage deviations of the solutions of all instances returned by the two algorithms.
+The red blue crosses correspond to the instances of size $50$ and the red crosses correspond to the instances of size $100$.
+
+We can see that there is a difference between the instances of size $50$ and the instances of size $100$.
+It seems that there is a correlation for instances of size $50$.
+However, for instances of size $100$, no correlation is visible.\newline
+
+A statistical test can be used to confirm the results again.
+A spearman test with a significance level equal to $0.05$ gives a p-value equal to $0.003$ for instances of size $50$ and a p-value equal to 0$.21$ for instances of size $100$.
+This result confirm the previous discussion, as the null hypothesis is rejected for instances of size $50$.\newline
+
+These results show that the SA algorithm may be improved to obtain better qualities on the easiest instances (according to the arpd's of GRASP).
+The cooling down step introduced may be unefficient and a bigger neighbourhood like the insert one could be better for this algorithm.
+
+\subsection{Run-time distributions}
+
+The figures \ref{fig:rt_sa} and \ref{fig:rt_grasp} show the Qualified run time distributions of the algorithms.
+This plots are obtained with 25 runs of the algorithms on the first 5 instances of size 50 with a time limit equal to ten times the previous one (for size 50).
+As the algorithms do not necessarily reach the best known solution, the run time distribution has been computed for $0.1$, $0.2$ and $1.2$ percent of the best known solution.
+The tests have been performed on Ubuntu 16.04 with a Intel Core i3-3110M CPU 2.40GHz. \newline
+
+We can observe on the plots of the two algorithms that the probabilty of reaching 1.2\% of the best solution is quite high from the beginning of the algorithm.
+However, the probability ton reach 0.1\% remains low at the begining of the runs.
+
+On the both plots, the black curve shows an exponential distribution.
+On the GRASP plot, the distribution is $1-2^{-\frac{x}{17}}$ and on the SA plot, the distribution is $1-2^{-\frac{x}{100}}$.
+On the grasp plot, wa can see that the exponential distribution does not fit completely with the qualified run time distribution, which means that the algorithm can be slightly improves with restarts.\newline
+
+The figure \ref{fig:rt_comp} shows the comparison between the qualified run time distribution for both algorithms with a goal equal to $0.5\%$ of the best known solution.
+We can observe that the grasp run time distribution dominates the sa one.
+Indeed, all the time, the probaility to reach the goal is higher with GRASP.
+It confirms the hypothesis that this implementation of GRASP is better than the one of Simulated Annealing.
+
+\begin{figure}
+    \centering
+        \includegraphics[scale=0.5]{images/rt_sa}
+    \caption{Qualified run time distribution of simulated annealing}
+    \label{fig:rt_sa}
+\end{figure}
+
+\begin{figure}
+    \centering
+        \includegraphics[scale=0.5]{images/rt_grasp}
+    \caption{Qualified run time distribution of GRASP}
+    \label{fig:rt_grasp}
+\end{figure}
+
+\begin{figure}
+    \centering
+        \includegraphics[scale=0.5]{images/rt_comp}
+    \caption{Comparison of qualified run time distributions}
+    \label{fig:rt_comp}
+\end{figure}
 
 
-\section{better solution found}
+\section{Conclusion}
 
-50\_20\_03 \newline
-1 28 24 14 48 15 34 45 19 5 18 37 11 29 31 9 39 10 25 33 30 44 2 43 7 41 20 40 49 47 38 4 42 17 16 22 6 26 8 50 13 21 32 23 46 36 35 3 12 27 \newline
-591806
+To conclude, the results show that the GRASP implementation is better than the SA one.
+The means, the statistical tests and the comparison of the qualified run time distributions give strong evidences.\newline
+
+However, the behaviour of the Simulated annealing is odd.
+The correlation plot shows that all the instances of size 100 seem to have the same difficulty with this algorithm.
+It is possible that bad choices were made during the implementation.
+A possible explanation is the use of the transpose neighbourhood (it was done to keep a small neighbourhood, in order to keep a low number of iterations for each temperature value).
+To improve the result, it should be interesting to test with the insert neighbourhood.
+The cooling down step could also be inefficient in this case.\newline
+
+To finish, it seems that GRASP can still be improved, as shown by the qualified run time distribution.
+
+% \section{better solution found}
+% 50\_20\_03 \newline
+% 1 28 24 14 48 15 34 45 19 5 18 37 11 29 31 9 39 10 25 33 30 44 2 43 7 41 20 40 49 47 38 4 42 17 16 22 6 26 8 50 13 21 32 23 46 36 35 3 12 27 \newline
+% 591806
 
 \begin{thebibliography}{12}
 

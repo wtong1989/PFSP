@@ -23,13 +23,10 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
     std::vector<int> solution2(instance.getNbJob()+1);
     long int cost2;
 
-    // int nbGr = 0;
-    // int nbStepTwo = 0;
     bool stepTwo;
 
     do {
 
-        // nbGr ++;
 
         // generate a greedy randomized initial solution
         long int cost = rzRandomizedHeuristic(instance, alpha, solution);
@@ -46,13 +43,9 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
             bestCost = cost;
             bestSol = solution;
             cur = clock();
-            t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
-            cout << "imp:" << t << ";" << bestCost << endl;
             stepTwo = true;
         } else {
             double proxi = (double)(cost-bestCost)/(double)cost;
-
-            // cout << "proximity: " << proxi << endl;
 
             if(proxi <= 0.02) {
                 stepTwo = true;
@@ -77,10 +70,6 @@ void grasp(PfspInstance& instance, std::vector<int>& bestSol, long int& bestCost
                 if(cost2 < bestCost) {
                     bestCost = cost2;
                     bestSol = solution2;
-                    // cout << "improvement bis: " << bestCost << endl;
-                    cur = clock();
-                    t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
-                    cout << "imp:" << t << ";" << bestCost << endl;
                 }
 
             }
@@ -175,7 +164,6 @@ void reactiveGrasp(PfspInstance& instance, std::vector<int>& bestSol, long int& 
         if(cost < bestCost || bestCost < 0) {
             bestCost = cost;
             bestSol = solution;
-            cout << "improvement: " << bestCost << endl;
         }
 
         // update best and worst solution during this reactive run
@@ -216,11 +204,7 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
     clock_t begin = clock(), cur;
     double t;
 
-    // cout << "initial cost: " << cost << endl;
-
     cur = clock();
-    t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
-    cout << "imp:" << t << ";" << bestCost << endl;
 
     // temperature
     double T = T0;
@@ -243,10 +227,6 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
             bestSol = sol;
             improve = true;
             cur = clock();
-            t = ((double)(cur - begin) / CLOCKS_PER_SEC)*1000.;
-            cout << "imp:" << t << ";" << bestCost << endl;
-            // cout << "improvement: " << bestCost << endl;
-            // cout << "temp: " << T << endl;
         }
 
         // update temperature
@@ -257,10 +237,7 @@ void simulatedAnnealing(PfspInstance& instance, std::vector<int>& bestSol, long 
 
             if(!improve) {
                 if(T <= 100) {
-                    // cout << "lastTem: " << T << endl;
                     T = T0;
-                    // T0 = T0*0.95;
-                    // cout << "warming up: " << cost << endl;
                 }
             } else {
                 improve = false;

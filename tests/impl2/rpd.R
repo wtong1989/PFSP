@@ -1,16 +1,23 @@
 # average percentage deviations means
+sa_arpd <- read.csv("../impl2/sa/arpd_sa.csv")
+grasp_arpd <- read.csv("../impl2/grasp/grasp_arpd.csv")
+
 
 # sa 50
 mean(sa_arpd[31:60,3])
+sd(sa_arpd[31:60,3])
 
 # sa 100
 mean(sa_arpd[1:30,3])
+sd(sa_arpd[1:30,3])
 
 # grasp 50
 mean(grasp_arpd[31:60,3])
+sd(grasp_arpd[31:60,3])
 
 # grasp 100
 mean(grasp_arpd[1:30,3])
+sd(grasp_arpd[1:30,3])
 
 # statistical difference test: wilcoxon
 
@@ -26,9 +33,9 @@ grasp_arpd <- read.csv("../impl2/grasp/grasp_arpd.csv")
 sa_arpd <- read.csv("../impl2/sa/arpd_sa.csv")
 
 plot(x=grasp_arpd[1:30,3], y=sa_arpd[1:30,3], 
-     main="a-rpd correlation", 
-     xlab="a-rpd with GRASP", 
-     ylab="a-rpd with Simulated Annealing", 
+     main="arpd correlation", 
+     xlab="arpd GRASP", 
+     ylab="arpd Simulated Annealing", 
      col="red", 
      xlim=c(0,1.5), ylim=c(0, 4.0),
      pch=4)
@@ -51,3 +58,4 @@ cor.test(x = grasp_arpd[1:30,3], y = sa_arpd[1:30, 3], method="spearman")$p.valu
 #correlation coefficient for size 50
 cor(x = grasp_arpd[31:60,3], y = sa_arpd[31:60, 3])
 cor.test(x = grasp_arpd[31:60,3], y = sa_arpd[31:60, 3], method="spearman")$p.value
+
